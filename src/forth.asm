@@ -1,3 +1,7 @@
+; ФОРТ-7970 ВЕРСИЯ 6.2 ОТ 19.06.85 (СТАНДАРТ FORTH-83)
+; В.А.КИРИЛЛИН А.А.КЛУБОВИЧ Н.Р.НОЗДРУНОВ
+; ВЦ ЛГУ
+; 198904 ЛЕНИНГРАД ПЕТРОДВОРЕЦ БИБЛИОТЕЧНАЯ ПЛ. Д. 2
 
 .MEMORYMAP
     DEFAULTSLOT 0
@@ -4557,19 +4561,18 @@ _END_2DCODE:     ; 3FD3 - 44E2
    .word __3FCSP          ; $3fe2 380B - ?CSP
    .word _EXIT            ; $3fe4 21A8 - EXIT
 
-aNFA_8_2A:
-   .db $02 $38
-   lhld $604f      ; $3fe8 2a 4f 60
+aNFA_8_2A:          ; 3FE6
+   .byte 2,"8*"
+   .word $604f      ; $3fe9
 a_8_2A:
-   call $218f      ; $3feb cd 8f 21
-   mov m,a         ; $3fee 77      
-   shld $22ed      ; $3fef 22 ed 22
-   mov m,a         ; $3ff2 77      
-   shld $22ed      ; $3ff3 22 ed 22
-   mov m,a         ; $3ff6 77      
-   shld $22ed      ; $3ff7 22 ed 22
-   xra b           ; $3ffa a8      
-   .db $21         ; $3ffb 21
+   call _FCALL      ; $3feb cd 8f 21
+   .word _DUP             ; $3fee 2277 - DUP
+   .word __2B             ; $3ff0 22ED - +
+   .word _DUP             ; $3ff2 2277 - DUP
+   .word __2B             ; $3ff4 22ED - +
+   .word _DUP             ; $3ff6 2277 - DUP
+   .word __2B             ; $3ff8 22ED - +
+   .word _EXIT            ; $3ffa 21A8 - EXIT
 
 aNFA_H:           ; 3FFC
    .byte 1,"H"
@@ -5400,9 +5403,10 @@ NFA_B_2DSP:      ; 44EE
 _B_2DSP:         ; 44F5 - 4521
    call __40     ; 44F5
    .word $0008   ; 44F8
-;!!!
+
+l44fa:
    call $f812      ; $44fa cd 12 f8
-   jz $44fa        ; $44fd ca fa 44
+   jz l44fa        ; $44fd ca fa 44
    call $f803      ; $4500 cd 03 f8
    ani $7f         ; $4503 e6 7f
    mov l,a         ; $4505 6f
@@ -5420,7 +5424,7 @@ _B_2DSP:         ; 44F5 - 4521
    nop             ; $4512 00
    nop             ; $4513 00
    nop             ; $4514 00
-   call $44fa      ; $4515 cd fa 44
+   call l44fa      ; $4515 cd fa 44
    mov a,l         ; $4518 7d
    cpi $43         ; $4519 fe 43
    jz $2006        ; $451b ca 06 20
@@ -5430,7 +5434,7 @@ NFA__28KEY_29:   ; 4521
    .byte 5,"(KEY)"
    .word NFA_B_2DSP         ; 44EE
 __28KEY_29:      ; 4529 - 4530
-   call $44fa      ; $4529 cd fa 44
+   call l44fa      ; $4529 cd fa 44
    push h          ; $452c e5
    jmp $219a       ; $452d c3 9a 21
 

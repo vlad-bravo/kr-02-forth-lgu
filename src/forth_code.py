@@ -6,8 +6,8 @@ from words_clip import (
     )
 
 # Адреса CFA-кодов словарных статей (от - до)
-PTR = 0x4597
-LIM = 0x45d5
+PTR = 0x3fee
+LIM = 0x3ffc
 
 words = {}
 
