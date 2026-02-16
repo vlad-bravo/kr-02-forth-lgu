@@ -6,7 +6,7 @@
 .MEMORYMAP
     DEFAULTSLOT 0
     SLOTSIZE 9689
-    SLOT 0 0x1FFC
+    SLOT 0 0x0000
 .ENDME
 
 .ROMBANKMAP
@@ -21,9 +21,7 @@
 .stringmaptable russian "russian.tbl"
 
 .BANK 0 SLOT 0
-.ORGA 0x1FFC
-
-   .db 0x20, 0x00, 0x45, 0xD0
+.ORGA 0x0000
 
 l2000:
    jmp l2006       ; #2000 c3 06 20
