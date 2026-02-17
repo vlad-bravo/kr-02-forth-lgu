@@ -3,18 +3,7 @@
 ; ВЦ ЛГУ
 ; 198904 ЛЕНИНГРАД ПЕТРОДВОРЕЦ БИБЛИОТЕЧНАЯ ПЛ. Д. 2
 
-.MEMORYMAP
-    DEFAULTSLOT 0
-    SLOTSIZE 9689
-    SLOT 0 0x1FFC
-.ENDME
-
-.ROMBANKMAP
-    BANKSTOTAL 1
-    BANKSIZE 9689
-    BANKS 1
-.ENDRO
-
+.include "memorymap.inc"
 .include "ramdefs.inc"
 .include "monitor.inc"
 
@@ -63,7 +52,7 @@ l2040:
    lhld l601c      ; #2044 2a 1c 60
    shld l601a      ; #2047 22 1a 60
    lxi b,l2050     ; #204a 01 50 20
-   jmp l219a       ; #204d c3 9a 21
+   jmp _FNEXT      ; #204d c3 9a 21
 
 l2050:
    .word _LIT             ; #2050 28C7 - LIT
@@ -262,7 +251,7 @@ _FCALL:
    mov m,c         ; #2195 71
    shld l601a      ; #2196 22 1a 60
    pop b           ; #2199 c1
-l219a:
+_FNEXT:
    ldax b          ; #219a 0a
    mov l,a         ; #219b 6f
    inx b           ; #219c 03
@@ -281,7 +270,7 @@ _EXIT:           ; 21A8 - 21B5
    mov b,m         ; #21ad 46
    inx h           ; #21ae 23
    shld l601a      ; #21af 22 1a 60
-   jmp l219a       ; #21b2 c3 9a 21
+   jmp _FNEXT      ; #21b2 c3 9a 21
 
 NFA_EXECUTE:     ; 21B5
    .byte 7,"EXECUTE"
@@ -324,7 +313,7 @@ NFA_NEXT:        ; 21EE
    .word NFA_ASMCALL      ; 21C0
 _NEXT:           ; 21F5 - 21FA
    call __40     ; 21F5
-   .word l219a   ; 21F8
+   .word _FNEXT  ; 21F8
 
 NFA_CALL:        ; 21FA
    .byte 4,"CALL"
@@ -342,7 +331,7 @@ _OVER:           ; 220D - 2215
    push d          ; #220f d5
    push h          ; #2210 e5
    push d          ; #2211 d5
-   jmp l219a       ; #2212 c3 9a 21
+   jmp _FNEXT      ; #2212 c3 9a 21
 
 NFA_PICK:        ; 2215
    .byte 4,"PICK"
@@ -355,14 +344,14 @@ _PICK:           ; 221C - 2226
    inx h           ; #2220 23
    mov d,m         ; #2221 56
    push d          ; #2222 d5
-   jmp l219a       ; #2223 c3 9a 21
+   jmp _FNEXT      ; #2223 c3 9a 21
 
 NFA_DROP:        ; 2226
    .byte 4,"DROP"
    .word NFA_PICK         ; 2215
 _DROP:           ; 222D - 2231
    pop h           ; #222d e1
-   jmp l219a       ; #222e c3 9a 21
+   jmp _FNEXT      ; #222e c3 9a 21
 
 NFA_SWAP:        ; 2231
    .byte 4,"SWAP"
@@ -371,7 +360,7 @@ _SWAP:           ; 2238 - 223E
    pop h           ; #2238 e1
    xthl            ; #2239 e3
    push h          ; #223a e5
-   jmp l219a       ; #223b c3 9a 21
+   jmp _FNEXT      ; #223b c3 9a 21
 
 NFA_2SWAP:       ; 223E
    .byte 5,"2SWAP"
@@ -388,7 +377,7 @@ _2SWAP:          ; 2246 - 2254
    xthl            ; #224e e3
    push d          ; #224f d5
    push h          ; #2250 e5
-   jmp l219a       ; #2251 c3 9a 21
+   jmp _FNEXT      ; #2251 c3 9a 21
 
 NFA_ROT:         ; 2254
    .byte 3,"ROT"
@@ -399,7 +388,7 @@ _ROT:            ; 225A - 2262
    xthl            ; #225c e3
    push d          ; #225d d5
    push h          ; #225e e5
-   jmp l219a       ; #225f c3 9a 21
+   jmp _FNEXT      ; #225f c3 9a 21
 
 NFA__2DROT:      ; 2262
    .byte 4,"-ROT"
@@ -410,7 +399,7 @@ __2DROT:         ; 2269 - 2271
    xthl            ; #226b e3
    push h          ; #226c e5
    push d          ; #226d d5
-   jmp l219a       ; #226e c3 9a 21
+   jmp _FNEXT      ; #226e c3 9a 21
 
 NFA_DUP:         ; 2271
    .byte 3,"DUP"
@@ -419,7 +408,7 @@ _DUP:            ; 2277 - 227D
    pop h           ; #2277 e1
    push h          ; #2278 e5
    push h          ; #2279 e5
-   jmp l219a       ; #227a c3 9a 21
+   jmp _FNEXT      ; #227a c3 9a 21
 
 NFA__3FDUP:      ; 227D
    .byte 4,"?DUP"
@@ -429,9 +418,9 @@ __3FDUP:         ; 2284 - 228F
    push h          ; #2285 e5
    mov a,h         ; #2286 7c
    ora l           ; #2287 b5
-   jz l219a        ; #2288 ca 9a 21
+   jz _FNEXT       ; #2288 ca 9a 21
    push h          ; #228b e5
-   jmp l219a       ; #228c c3 9a 21
+   jmp _FNEXT      ; #228c c3 9a 21
 
 NFA_2DUP:        ; 228F
    .byte 4,"2DUP"
@@ -443,7 +432,7 @@ _2DUP:           ; 2296 - 229F
    push h          ; #2299 e5
    push d          ; #229a d5
    push h          ; #229b e5
-   jmp l219a       ; #229c c3 9a 21
+   jmp _FNEXT      ; #229c c3 9a 21
 
 NFA_2DROP:       ; 229F
    .byte 5,"2DROP"
@@ -451,7 +440,7 @@ NFA_2DROP:       ; 229F
 _2DROP:          ; 22A7 - 22AC
    pop d           ; #22a7 d1
    pop d           ; #22a8 d1
-   jmp l219a       ; #22a9 c3 9a 21
+   jmp _FNEXT      ; #22a9 c3 9a 21
 
 NFA_PRESS:       ; 22AC
    .byte 5,"PRESS"
@@ -459,7 +448,7 @@ NFA_PRESS:       ; 22AC
 _PRESS:          ; 22B4 - 22B9
    pop h           ; #22b4 e1
    xthl            ; #22b5 e3
-   jmp l219a       ; #22b6 c3 9a 21
+   jmp _FNEXT      ; #22b6 c3 9a 21
 
 NFA_2OVER:       ; 22B9
    .byte 5,"2OVER"
@@ -477,7 +466,7 @@ _2OVER:          ; 22C1 - 22D0
    dcx sp          ; #22ca 3b
    push h          ; #22cb e5
    push d          ; #22cc d5
-   jmp l219a       ; #22cd c3 9a 21
+   jmp _FNEXT      ; #22cd c3 9a 21
 
 NFA_SP_40:       ; 22D0
    .byte 3,"SP@"
@@ -486,7 +475,7 @@ _SP_40:          ; 22D6 - 22DE
    lxi h,0000      ; #22d6 21 00 00
    dad sp          ; #22d9 39
    push h          ; #22da e5
-   jmp l219a       ; #22db c3 9a 21
+   jmp _FNEXT      ; #22db c3 9a 21
 
 NFA_SP_21:       ; 22DE
    .byte 3,"SP!"
@@ -494,7 +483,7 @@ NFA_SP_21:       ; 22DE
 _SP_21:          ; 22E4 - 22E9
    pop h           ; #22e4 e1
    sphl            ; #22e5 f9
-   jmp l219a       ; #22e6 c3 9a 21
+   jmp _FNEXT      ; #22e6 c3 9a 21
 
 NFA__2B:         ; 22E9
    .byte 1,"+"
@@ -504,7 +493,7 @@ __2B:            ; 22ED - 22F4
    pop d           ; #22ee d1
    dad d           ; #22ef 19
    push h          ; #22f0 e5
-   jmp l219a       ; #22f1 c3 9a 21
+   jmp _FNEXT      ; #22f1 c3 9a 21
 
 NFA__2D:         ; 22F4
    .byte 1,"-"
@@ -519,7 +508,7 @@ __2D:            ; 22F8 - 2304
    sbb h           ; #22fe 9c
    mov h,a         ; #22ff 67
    push h          ; #2300 e5
-   jmp l219a       ; #2301 c3 9a 21
+   jmp _FNEXT      ; #2301 c3 9a 21
 
 NFA_NEGATE:      ; 2304
    .byte 6,"NEGATE"
@@ -528,7 +517,7 @@ _NEGATE:         ; 230D - 2315
    pop h
    call l242f      ; #230e cd 2f 24
    push h          ; #2311 e5
-   jmp l219a       ; #2312 c3 9a 21
+   jmp _FNEXT      ; #2312 c3 9a 21
 
 NFA_1_2B:        ; 2315
    .byte 2,"1+"
@@ -537,7 +526,7 @@ _1_2B:           ; 231A - 2320
    pop h           ; #231a e1
    inx h           ; #231b 23
    push h          ; #231c e5
-   jmp l219a       ; #231d c3 9a 21
+   jmp _FNEXT      ; #231d c3 9a 21
 
 NFA_2_2B:        ; 2320
    .byte 2,"2+"
@@ -547,7 +536,7 @@ _2_2B:           ; 2325 - 232C
    inx h           ; #2326 23
    inx h           ; #2327 23
    push h          ; #2328 e5
-   jmp l219a       ; #2329 c3 9a 21
+   jmp _FNEXT      ; #2329 c3 9a 21
 
 NFA_1_2D:        ; 232C
    .byte 2,"1-"
@@ -556,7 +545,7 @@ _1_2D:           ; 2331 - 2337
    pop h           ; #2331 e1
    dcx h           ; #2332 2b
    push h          ; #2333 e5
-   jmp l219a       ; #2334 c3 9a 21
+   jmp _FNEXT      ; #2334 c3 9a 21
 
 NFA_2_2D:        ; 2337
    .byte 2,"2-"
@@ -566,7 +555,7 @@ _2_2D:           ; 233C - 2343
    dcx h           ; #233d 2b
    dcx h           ; #233e 2b
    push h          ; #233f e5
-   jmp l219a       ; #2340 c3 9a 21
+   jmp _FNEXT      ; #2340 c3 9a 21
 
 NFA_2_2A:        ; 2343
    .byte 2,"2*"
@@ -575,7 +564,7 @@ _2_2A:           ; 2348 - 234E
    pop h           ; #2348 e1
    dad h           ; #2349 29
    push h          ; #234a e5
-   jmp l219a       ; #234b c3 9a 21
+   jmp _FNEXT      ; #234b c3 9a 21
 
 NFA_ABS:         ; 234E
    .byte 3,"ABS"
@@ -586,7 +575,7 @@ _ABS:            ; 2354 - 235E
    ora a           ; #2356 b7
    cm l242f        ; #2357 fc 2f 24
    push h          ; #235a e5
-   jmp l219a       ; #235b c3 9a 21
+   jmp _FNEXT      ; #235b c3 9a 21
 
 NFA_MIN:         ; 235E
    .byte 3,"MIN"
@@ -606,9 +595,9 @@ _MIN:            ; 2364 - 237B
    mov a,h         ; #2372 7c
    sbb d           ; #2373 9a
 @2374:
-   jp l219a        ; #2374 f2 9a 21
+   jp _FNEXT       ; #2374 f2 9a 21
    xthl            ; #2377 e3
-   jmp l219a       ; #2378 c3 9a 21
+   jmp _FNEXT      ; #2378 c3 9a 21
 
 NFA_MAX:         ; 237B
    .byte 3,"MAX"
@@ -628,9 +617,9 @@ _MAX:            ; 2381 - 2398
    mov a,d         ; #238f 7a
    sbb h           ; #2390 9c
 @2391:
-   jp l219a        ; #2391 f2 9a 21
+   jp _FNEXT       ; #2391 f2 9a 21
    xthl            ; #2394 e3
-   jmp l219a       ; #2395 c3 9a 21
+   jmp _FNEXT      ; #2395 c3 9a 21
 
 NFA_U_3C:        ; 2398
    .byte 2,"U<"
@@ -647,7 +636,7 @@ _U_3C:           ; 239D - 23AE
    inx h           ; #23a9 23
 @23aa:
    push h          ; #23aa e5
-   jmp l219a       ; #23ab c3 9a 21
+   jmp _FNEXT      ; #23ab c3 9a 21
 
 NFA__3C:         ; 23AE
    .byte 1,"<"
@@ -674,7 +663,7 @@ l23b4:
    dcx h           ; #23cd 2b
 @23ce:
    push h          ; #23ce e5
-   jmp l219a       ; #23cf c3 9a 21
+   jmp _FNEXT      ; #23cf c3 9a 21
 
 NFA__3E:         ; 23D2
    .byte 1,">"
@@ -696,7 +685,7 @@ _0_3C:           ; 23E0 - 23EE
    dcx h           ; #23e9 2b
 @23ea:
    push h          ; #23ea e5
-   jmp l219a       ; #23eb c3 9a 21
+   jmp _FNEXT      ; #23eb c3 9a 21
 
 NFA_0_3E:        ; 23EE
    .byte 2,"0>"
@@ -712,7 +701,7 @@ _0_3E:           ; 23F3 - 2405
    dcx h           ; #2400 2b
 @2401:
    push h          ; #2401 e5
-   jmp l219a       ; #2402 c3 9a 21
+   jmp _FNEXT      ; #2402 c3 9a 21
 
 NFA__3D:         ; 2405
    .byte 1,"="
@@ -731,7 +720,7 @@ __3D:            ; 2409 - 241C
    dcx h           ; #2417 2b
 @2418:
    push h          ; #2418 e5
-   jmp l219a       ; #2419 c3 9a 21
+   jmp _FNEXT      ; #2419 c3 9a 21
 
 NFA_0_3D:        ; 241C
    .byte 2,"0="
@@ -745,7 +734,7 @@ _0_3D:           ; 2421 - 2437
    dcx d           ; #242a 1b
 @242b:
    push d          ; #242b d5
-   jmp l219a       ; #242c c3 9a 21
+   jmp _FNEXT      ; #242c c3 9a 21
 l242f:
    mov a,h         ; #242f 7c
    cma             ; #2430 2f
@@ -776,7 +765,7 @@ __2DTRAILING:    ; 2443 - 245B
    jnz @244c       ; #2454 c2 4c 24
 @2457:
    push d          ; #2457 d5
-   jmp l219a       ; #2458 c3 9a 21
+   jmp _FNEXT      ; #2458 c3 9a 21
 
 NFA_2_2F:        ; 245B
    .byte 2,"2/"
@@ -792,7 +781,7 @@ _2_2F:           ; 2460 - 246D
    rar             ; #2467 1f
    mov l,a         ; #2468 6f
    push h          ; #2469 e5
-   jmp l219a       ; #246a c3 9a 21
+   jmp _FNEXT      ; #246a c3 9a 21
 
 NFA_D_2B:        ; 246D
    .byte 2,"D+"
@@ -810,7 +799,7 @@ _D_2B:           ; 2472 - 2482
    inx h           ; #247d 23
 @247e:
    push h          ; #247e e5
-   jmp l219a       ; #247f c3 9a 21
+   jmp _FNEXT      ; #247f c3 9a 21
 
 NFA_D_3C:        ; 2482
    .byte 2,"D<"
@@ -853,7 +842,7 @@ _D_3C:           ; 2487 - 24B9
    dcx d           ; #24b4 1b
 @24b5:
    push d          ; #24b5 d5
-   jmp l219a       ; #24b6 c3 9a 21
+   jmp _FNEXT      ; #24b6 c3 9a 21
 
 NFA_DNEGATE:     ; 24B9
    .byte 7,"DNEGATE"
@@ -876,7 +865,7 @@ _DNEGATE:        ; 24C3 - 24D8
    sbb h           ; #24d2 9c
    mov h,a         ; #24d3 67
    push h          ; #24d4 e5
-   jmp l219a       ; #24d5 c3 9a 21
+   jmp _FNEXT      ; #24d5 c3 9a 21
 
 NFA__2DTEXT:     ; 24D8
    .byte 5,"-TEXT"
@@ -914,7 +903,7 @@ __2DTEXT:        ; 24E0 - 250D
 @2508:
    pop b           ; #2508 c1
    push h          ; #2509 e5
-   jmp l219a       ; #250a c3 9a 21
+   jmp _FNEXT      ; #250a c3 9a 21
 
 NFA_ROLL:        ; 250D
    .byte 4,"ROLL"
@@ -923,7 +912,7 @@ _ROLL:           ; 2514 - 2538
    pop h           ; #2514 e1
    mov a,h         ; #2515 7c
    ora l           ; #2516 b5
-   jz l219a        ; #2517 ca 9a 21
+   jz _FNEXT       ; #2517 ca 9a 21
    inx h           ; #251a 23
    dad h           ; #251b 29
    push h          ; #251c e5
@@ -950,7 +939,7 @@ _ROLL:           ; 2514 - 2538
    jnz @2529       ; #2530 c2 29 25
    pop b           ; #2533 c1
    pop h           ; #2534 e1
-   jmp l219a       ; #2535 c3 9a 21
+   jmp _FNEXT      ; #2535 c3 9a 21
 
 NFA__2A:         ; 2538
    .byte 1,"*"
@@ -970,7 +959,7 @@ __2A:            ; 253C - 2562
    call @2555      ; #254d cd 55 25
    pop b           ; #2550 c1
    push h          ; #2551 e5
-   jmp l219a       ; #2552 c3 9a 21
+   jmp _FNEXT      ; #2552 c3 9a 21
 @2555:
    rar             ; #2555 1f
    jnc @255a       ; #2556 d2 5a 25
@@ -996,7 +985,7 @@ _UM_2A:          ; 2568 - 2591
    pop b           ; #2570 c1
    push d          ; #2571 d5
    push h          ; #2572 e5
-   jmp l219a       ; #2573 c3 9a 21
+   jmp _FNEXT      ; #2573 c3 9a 21
 @2576:
    xra a           ; #2576 af
    mov d,a         ; #2577 57
@@ -1105,7 +1094,7 @@ _DU_2FMOD:       ; 259A - 2677
    push d          ; #2615 d5
    dcr a           ; #2616 3d
    jnz @2611       ; #2617 c2 11 26
-   jmp l219a       ; #261a c3 9a 21
+   jmp _FNEXT      ; #261a c3 9a 21
 @261d:
    push b          ; #261d c5
    mvi b,04        ; #261e 06 04
@@ -1214,7 +1203,7 @@ __2FMOD:         ; 267E - 26BF
    pop b           ; #269e c1
    push d          ; #269f d5
    push h          ; #26a0 e5
-   jmp l219a       ; #26a1 c3 9a 21
+   jmp _FNEXT      ; #26a1 c3 9a 21
 @26a4:
    pop psw         ; #26a4 f1
    push psw        ; #26a5 f5
@@ -1235,7 +1224,7 @@ __2FMOD:         ; 267E - 26BF
    pop b           ; #26b9 c1
    push h          ; #26ba e5
    push d          ; #26bb d5
-   jmp l219a       ; #26bc c3 9a 21
+   jmp _FNEXT      ; #26bc c3 9a 21
 
 NFA_U_2FMOD:     ; 26BF
    .byte 5,"U/MOD"
@@ -1248,7 +1237,7 @@ _U_2FMOD:        ; 26C7 - 26D3
    pop b           ; #26cd c1
    push d          ; #26ce d5
    push h          ; #26cf e5
-   jmp l219a       ; #26d0 c3 9a 21
+   jmp _FNEXT      ; #26d0 c3 9a 21
 
 NFA__3FWORD:     ; 26D3
    .byte 5,"?WORD"
@@ -1294,7 +1283,7 @@ __3FWORD:        ; 26DB - 2727
    push h          ; #270b e5
    lxi h,0xffff    ; #270c 21 ff ff
    push h          ; #270f e5
-   jmp l219a       ; #2710 c3 9a 21
+   jmp _FNEXT      ; #2710 c3 9a 21
 @2713:
    mov a,c         ; #2713 79
    ani 0x3f        ; #2714 e6 3f
@@ -1310,7 +1299,7 @@ __3FWORD:        ; 26DB - 2727
    push d          ; #271f d5
    lxi h,0000      ; #2720 21 00 00
    push h          ; #2723 e5
-   jmp l219a       ; #2724 c3 9a 21
+   jmp _FNEXT      ; #2724 c3 9a 21
 
 NFA_DIGIT:       ; 2727
    .byte 5,"DIGIT"
@@ -1331,7 +1320,7 @@ _DIGIT:          ; 272F - 275E
    push h          ; #2743 e5
    lxi h,0xffff    ; #2744 21 ff ff
    push h          ; #2747 e5
-   jmp l219a       ; #2748 c3 9a 21
+   jmp _FNEXT      ; #2748 c3 9a 21
 @274b:
    cpi 0x41        ; #274b fe 41
    jm @2757        ; #274d fa 57 27
@@ -1341,7 +1330,7 @@ _DIGIT:          ; 272F - 275E
 @2757:
    lxi h,0000      ; #2757 21 00 00
    push h          ; #275a e5
-   jmp l219a       ; #275b c3 9a 21
+   jmp _FNEXT      ; #275b c3 9a 21
 
 NFA_AND:         ; 275E
    .byte 3,"AND"
@@ -1356,7 +1345,7 @@ _AND:            ; 2764 - 2770
    ana h           ; #276a a4
    mov h,a         ; #276b 67
    push h          ; #276c e5
-   jmp l219a       ; #276d c3 9a 21
+   jmp _FNEXT      ; #276d c3 9a 21
 
 NFA_OR:          ; 2770
    .byte 2,"OR"
@@ -1371,7 +1360,7 @@ _OR:             ; 2775 - 2781
    ora h           ; #277b b4
    mov h,a         ; #277c 67
    push h          ; #277d e5
-   jmp l219a       ; #277e c3 9a 21
+   jmp _FNEXT      ; #277e c3 9a 21
 
 NFA_XOR:         ; 2781
    .byte 3,"XOR"
@@ -1386,7 +1375,7 @@ _XOR:            ; 2787 - 2793
    xra h           ; #278d ac
    mov h,a         ; #278e 67
    push h          ; #278f e5
-   jmp l219a       ; #2790 c3 9a 21
+   jmp _FNEXT      ; #2790 c3 9a 21
 
 NFA_NOT:         ; 2793
    .byte 3,"NOT"
@@ -1400,7 +1389,7 @@ _NOT:            ; 2799 - 27A4
    cma             ; #279e 2f
    mov l,a         ; #279f 6f
    push h          ; #27a0 e5
-   jmp l219a       ; #27a1 c3 9a 21
+   jmp _FNEXT      ; #27a1 c3 9a 21
 
 NFA__3ER:        ; 27A4
    .byte 2,">R"
@@ -1413,7 +1402,7 @@ __3ER:           ; 27A9 - 27B7
    dcx h           ; #27af 2b
    mov m,e         ; #27b0 73
    shld l601a      ; #27b1 22 1a 60
-   jmp l219a       ; #27b4 c3 9a 21
+   jmp _FNEXT      ; #27b4 c3 9a 21
 
 NFA_R_3E:        ; 27B7
    .byte 2,"R>"
@@ -1426,7 +1415,7 @@ _R_3E:           ; 27BC - 27CA
    inx h           ; #27c2 23
    push d          ; #27c3 d5
    shld l601a      ; #27c4 22 1a 60
-   jmp l219a       ; #27c7 c3 9a 21
+   jmp _FNEXT      ; #27c7 c3 9a 21
 
 NFA_R_40:        ; 27CA
    .byte 2,"R@"
@@ -1437,7 +1426,7 @@ _R_40:           ; 27CF - 27D9
    inx h           ; #27d3 23
    mov d,m         ; #27d4 56
    push d          ; #27d5 d5
-   jmp l219a       ; #27d6 c3 9a 21
+   jmp _FNEXT      ; #27d6 c3 9a 21
 
 NFA_RP_40:       ; 27D9
    .byte 3,"RP@"
@@ -1445,7 +1434,7 @@ NFA_RP_40:       ; 27D9
 _RP_40:          ; 27DF - 27E6
    lhld l601a      ; #27df 2a 1a 60
    push h          ; #27e2 e5
-   jmp l219a       ; #27e3 c3 9a 21
+   jmp _FNEXT      ; #27e3 c3 9a 21
 
 NFA_RP_21:       ; 27E6
    .byte 3,"RP!"
@@ -1453,7 +1442,7 @@ NFA_RP_21:       ; 27E6
 _RP_21:          ; 27EC - 27F3
    pop h           ; #27ec e1
    shld l601a      ; #27ed 22 1a 60
-   jmp l219a       ; #27f0 c3 9a 21
+   jmp _FNEXT      ; #27f0 c3 9a 21
 
 NFA_RPICK:       ; 27F3
    .byte 5,"RPICK"
@@ -1468,7 +1457,7 @@ _RPICK:          ; 27FB - 2809
    inx h           ; #2803 23
    mov d,m         ; #2804 56
    push d          ; #2805 d5
-   jmp l219a       ; #2806 c3 9a 21
+   jmp _FNEXT      ; #2806 c3 9a 21
 
 NFA_RDROP:       ; 2809
    .byte 5,"RDROP"
@@ -1478,7 +1467,7 @@ _RDROP:          ; 2811 - 281C
    inx h           ; #2814 23
    inx h           ; #2815 23
    shld l601a      ; #2816 22 1a 60
-   jmp l219a       ; #2819 c3 9a 21
+   jmp _FNEXT      ; #2819 c3 9a 21
 
 NFA__40:         ; 281C
    .byte 1,"@"
@@ -1489,7 +1478,7 @@ __40:            ; 2820 - 2828
    inx h           ; #2822 23
    mov d,m         ; #2823 56
    push d          ; #2824 d5
-   jmp l219a       ; #2825 c3 9a 21
+   jmp _FNEXT      ; #2825 c3 9a 21
 
 NFA_C_40:        ; 2828
    .byte 2,"C@"
@@ -1499,7 +1488,7 @@ _C_40:           ; 282D - 2835
    mov e,m         ; #282e 5e
    mvi d,00        ; #282f 16 00
    push d          ; #2831 d5
-   jmp l219a       ; #2832 c3 9a 21
+   jmp _FNEXT      ; #2832 c3 9a 21
 
 NFA__21:         ; 2835
    .byte 1,"!"
@@ -1510,7 +1499,7 @@ __21:            ; 2839 - 2841
    mov m,e         ; #283b 73
    inx h           ; #283c 23
    mov m,d         ; #283d 72
-   jmp l219a       ; #283e c3 9a 21
+   jmp _FNEXT      ; #283e c3 9a 21
 
 NFA_C_21:        ; 2841
    .byte 2,"C!"
@@ -1519,7 +1508,7 @@ _C_21:           ; 2846 - 284C
    pop h           ; #2846 e1
    pop d           ; #2847 d1
    mov m,e         ; #2848 73
-   jmp l219a       ; #2849 c3 9a 21
+   jmp _FNEXT      ; #2849 c3 9a 21
 
 NFA_2_21:        ; 284C
    .byte 2,"2!"
@@ -1535,7 +1524,7 @@ _2_21:           ; 2851 - 285E
    mov m,e         ; #2858 73
    inx h           ; #2859 23
    mov m,d         ; #285a 72
-   jmp l219a       ; #285b c3 9a 21
+   jmp _FNEXT      ; #285b c3 9a 21
 
 NFA_2_40:        ; 285E
    .byte 2,"2@"
@@ -1552,7 +1541,7 @@ _2_40:           ; 2863 - 2871
    mov l,a         ; #286b 6f
    push h          ; #286c e5
    push d          ; #286d d5
-   jmp l219a       ; #286e c3 9a 21
+   jmp _FNEXT      ; #286e c3 9a 21
 
 NFA__2B_21:      ; 2871
    .byte 2,"+!"
@@ -1567,7 +1556,7 @@ __2B_21:         ; 2876 - 2882
    mov a,m         ; #287c 7e
    adc d           ; #287d 8a
    mov m,a         ; #287e 77
-   jmp l219a       ; #287f c3 9a 21
+   jmp _FNEXT      ; #287f c3 9a 21
 
 NFA__2D_21:      ; 2882
    .byte 2,"-!"
@@ -1582,7 +1571,7 @@ __2D_21:         ; 2887 - 2893
    mov a,m         ; #288d 7e
    sbb d           ; #288e 9a
    mov m,a         ; #288f 77
-   jmp l219a       ; #2890 c3 9a 21
+   jmp _FNEXT      ; #2890 c3 9a 21
 
 NFA_0_21:        ; 2893
    .byte 2,"0!"
@@ -1593,7 +1582,7 @@ _0_21:           ; 2898 - 28A0
    mov m,a         ; #289a 77
    inx h           ; #289b 23
    mov m,a         ; #289c 77
-   jmp l219a       ; #289d c3 9a 21
+   jmp _FNEXT      ; #289d c3 9a 21
 
 NFA_1_2B_21:     ; 28A0
    .byte 3,"1+!"
@@ -1601,10 +1590,10 @@ NFA_1_2B_21:     ; 28A0
 _1_2B_21:        ; 28A6 - 28B0
    pop h           ; #28a6 e1
    inr m           ; #28a7 34
-   jnz l219a       ; #28a8 c2 9a 21
+   jnz _FNEXT      ; #28a8 c2 9a 21
    inx h           ; #28ab 23
    inr m           ; #28ac 34
-   jmp l219a       ; #28ad c3 9a 21
+   jmp _FNEXT      ; #28ad c3 9a 21
 
 NFA_1_2D_21:     ; 28B0
    .byte 3,"1-!"
@@ -1618,7 +1607,7 @@ _1_2D_21:        ; 28B6 - 28C1
    mov m,d         ; #28bb 72
    dcx h           ; #28bc 2b
    mov m,e         ; #28bd 73
-   jmp l219a       ; #28be c3 9a 21
+   jmp _FNEXT      ; #28be c3 9a 21
 
 NFA_LIT:         ; 28C1
    .byte 3,"LIT"
@@ -1631,7 +1620,7 @@ _LIT:            ; 28C7 - 28D1
    mov h,a         ; #28cb 67
    inx b           ; #28cc 03
    push h          ; #28cd e5
-   jmp l219a       ; #28ce c3 9a 21
+   jmp _FNEXT      ; #28ce c3 9a 21
 
 NFA_DLIT:        ; 28D1
    .byte 4,"DLIT"
@@ -1651,7 +1640,7 @@ _DLIT:           ; 28D8 - 28E9
    inx b           ; #28e3 03
    push h          ; #28e4 e5
    push d          ; #28e5 d5
-   jmp l219a       ; #28e6 c3 9a 21
+   jmp _FNEXT      ; #28e6 c3 9a 21
 
 NFA__28_22_29:   ; 28E9
    .byte 3,"(\")"
@@ -1665,7 +1654,7 @@ __28_22_29:      ; 28EF - 28FB
    dad b           ; #28f5 09
    mov b,h         ; #28f6 44
    mov c,l         ; #28f7 4d
-   jmp l219a       ; #28f8 c3 9a 21
+   jmp _FNEXT      ; #28f8 c3 9a 21
 
 NFA_BRANCH:      ; 28FB
    .byte 6,"BRANCH"
@@ -1676,7 +1665,7 @@ _BRANCH:         ; 2904 - 290C
    mov c,m         ; #2906 4e
    inx h           ; #2907 23
    mov b,m         ; #2908 46
-   jmp l219a       ; #2909 c3 9a 21
+   jmp _FNEXT      ; #2909 c3 9a 21
 
 NFA__3FBRANCH:   ; 290C
    .byte 7,"?BRANCH"
@@ -1691,11 +1680,11 @@ __3FBRANCH:      ; 2916 - 2929
    mov c,m         ; #291e 4e
    inx h           ; #291f 23
    mov b,m         ; #2920 46
-   jmp l219a       ; #2921 c3 9a 21
+   jmp _FNEXT      ; #2921 c3 9a 21
 @2924:
    inx b           ; #2924 03
    inx b           ; #2925 03
-   jmp l219a       ; #2926 c3 9a 21
+   jmp _FNEXT      ; #2926 c3 9a 21
 
 NFA_N_3FBRANCH:  ; 2929
    .byte 8,"N?BRANCH"
@@ -1707,14 +1696,14 @@ _N_3FBRANCH:     ; 2934 - 2947
    jnz @293f       ; #2937 c2 3f 29
    inx b           ; #293a 03
    inx b           ; #293b 03
-   jmp l219a       ; #293c c3 9a 21
+   jmp _FNEXT      ; #293c c3 9a 21
 @293f:
    mov h,b         ; #293f 60
    mov l,c         ; #2940 69
    mov c,m         ; #2941 4e 
    inx h           ; #2942 23
    mov b,m         ; #2943 46
-   jmp l219a       ; #2944 c3 9a 21
+   jmp _FNEXT      ; #2944 c3 9a 21
 
 NFA_I:           ; 2947
    .byte 1,"I"
@@ -1725,7 +1714,7 @@ _I:              ; 294B - 2955
    inx h           ; #294f 23
    mov d,m         ; #2950 56
    push d          ; #2951 d5
-   jmp l219a       ; #2952 c3 9a 21
+   jmp _FNEXT      ; #2952 c3 9a 21
 
 NFA_J:           ; 2955
    .byte 1,"J"
@@ -1738,7 +1727,7 @@ _J:              ; 2959 - 2967
    inx h           ; #2961 23
    mov d,m         ; #2962 56
    push d          ; #2963 d5
-   jmp l219a       ; #2964 c3 9a 21
+   jmp _FNEXT      ; #2964 c3 9a 21
 
 NFA_K:           ; 2967
    .byte 1,"K"
@@ -1751,7 +1740,7 @@ _K:              ; 296B - 2979
    inx h           ; #2973 23
    mov d,m         ; #2974 56
    push d          ; #2975 d5
-   jmp l219a       ; #2976 c3 9a 21
+   jmp _FNEXT      ; #2976 c3 9a 21
 
 NFA_TOGGLE:      ; 2979
    .byte 6,"TOGGLE"
@@ -1762,7 +1751,7 @@ _TOGGLE:         ; 2982 - 298A
    pop h           ; #2984 e1
    xra m           ; #2985 ae
    mov m,a         ; #2986 77
-   jmp l219a       ; #2987 c3 9a 21
+   jmp _FNEXT      ; #2987 c3 9a 21
 
 NFA__28DO_29:    ; 298A
    .byte 4,"(DO)"
@@ -1792,7 +1781,7 @@ __28DO_29:       ; 2991 - 29B0
    dcx h           ; #29a8 2b
    mov m,e         ; #29a9 73
    shld l601a      ; #29aa 22 1a 60
-   jmp l219a       ; #29ad c3 9a 21
+   jmp _FNEXT      ; #29ad c3 9a 21
 
 NFA__28_3FDO_29: ; 29B0
    .byte 5,"(?DO)"
@@ -1816,7 +1805,7 @@ __28_3FDO_29:    ; 29B8 - 29D1
    mov c,d         ; #29cb 4a
    pop h           ; #29cc e1
    pop h           ; #29cd e1
-   jmp l219a       ; #29ce c3 9a 21
+   jmp _FNEXT      ; #29ce c3 9a 21
 
 NFA__28LOOP_29:  ; 29D1
    .byte 6,"(LOOP)"
@@ -1842,7 +1831,7 @@ l29e2:
    shld l601a      ; #29f0 22 1a 60
    inx b           ; #29f3 03
    inx b           ; #29f4 03
-   jmp l219a       ; #29f5 c3 9a 21
+   jmp _FNEXT      ; #29f5 c3 9a 21
 @29f8:
    dcx h           ; #29f8 2b
    dcx h           ; #29f9 2b
@@ -1854,7 +1843,7 @@ l29e2:
    mov c,m         ; #29ff 4e
    inx h           ; #2a00 23
    mov b,m         ; #2a01 46
-   jmp l219a       ; #2a02 c3 9a 21
+   jmp _FNEXT      ; #2a02 c3 9a 21
 
 NFA__28_2BLOOP_29:; 2A05
    .byte 7,"(+LOOP)"
@@ -1902,7 +1891,7 @@ l2a32:
    jnz @2a38       ; #2a41 c2 38 2a
 l2a44:
    pop b           ; #2a44 c1
-   jmp l219a       ; #2a45 c3 9a 21
+   jmp _FNEXT      ; #2a45 c3 9a 21
 
 NFA_CMOVE_3E:    ; 2A48
    .byte 6,"CMOVE>"
@@ -1934,10 +1923,10 @@ l2a5b:
    dcr b           ; #2a6c 05
    jnz @2a64       ; #2a6d c2 64 2a
    pop b           ; #2a70 c1
-   jmp l219a       ; #2a71 c3 9a 21
+   jmp _FNEXT      ; #2a71 c3 9a 21
 l2a74:
    pop b           ; #2a74 c1
-   jmp l219a       ; #2a75 c3 9a 21
+   jmp _FNEXT      ; #2a75 c3 9a 21
 
 NFA__3CCMOVE_3E: ; 2A78
    .byte 7,"<CMOVE>"
@@ -1959,7 +1948,7 @@ __3CCMOVE_3E:    ; 2A82 - 2A9A
    jmp l2a5b       ; #2a93 c3 5b 2a
 @2a96:
    pop b           ; #2a96 c1
-   jmp l219a       ; #2a97 c3 9a 21
+   jmp _FNEXT      ; #2a97 c3 9a 21
 
 NFA_FILL:        ; 2A9A
    .byte 4,"FILL"
@@ -1971,7 +1960,7 @@ _FILL:           ; 2AA1 - 2ABD
    ora l           ; #2aa4 b5
    jnz @2aac       ; #2aa5 c2 ac 2a
    pop h           ; #2aa8 e1
-   jmp l219a       ; #2aa9 c3 9a 21
+   jmp _FNEXT      ; #2aa9 c3 9a 21
 @2aac:
    mov a,e         ; #2aac 7b
    pop d           ; #2aad d1
@@ -1984,7 +1973,7 @@ _FILL:           ; 2AA1 - 2ABD
    dad b           ; #2ab5 09
    jc @2ab3        ; #2ab6 da b3 2a
    pop b           ; #2ab9 c1
-   jmp l219a       ; #2aba c3 9a 21
+   jmp _FNEXT      ; #2aba c3 9a 21
 
 NFA_0_3EBL:      ; 2ABD
    .byte 4,"0>BL"
@@ -2001,7 +1990,7 @@ _0_3EBL:         ; 2AC4 - 2AD5
    inx h           ; #2acd 23
    dcr e           ; #2ace 1d
    jnz @2ac6       ; #2acf c2 c6 2a
-   jmp l219a       ; #2ad2 c3 9a 21
+   jmp _FNEXT      ; #2ad2 c3 9a 21
 
 NFA_ENCLOSE:     ; 2AD5
    .byte 7,"ENCLOSE"
@@ -2051,12 +2040,12 @@ _ENCLOSE:        ; 2ADF - 2B1D
    push h          ; #2b0d e5
    lxi h,0xffff    ; #2b0e 21 ff ff
    push h          ; #2b11 e5
-   jmp l219a       ; #2b12 c3 9a 21
+   jmp _FNEXT      ; #2b12 c3 9a 21
 @2b15:
    pop b           ; #2b15 c1
    lxi h,0000      ; #2b16 21 00 00
    push h          ; #2b19 e5
-   jmp l219a       ; #2b1a c3 9a 21
+   jmp _FNEXT      ; #2b1a c3 9a 21
 
 NFA__2D1:        ; 2B1D
    .byte 2,"-1"
@@ -5646,7 +5635,7 @@ NFA__28KEY_29:   ; 4521
 __28KEY_29:      ; 4529 - 4530
    call l44fa      ; #4529 cd fa 44
    push h          ; #452c e5
-   jmp l219a       ; #452d c3 9a 21
+   jmp _FNEXT      ; #452d c3 9a 21
 
 NFA__28EMIT_29:  ; 4530
    .byte 6,"(EMIT)"
@@ -5661,7 +5650,7 @@ __28EMIT_29:     ; 4539 - 4547
    nop             ; #4541 00
    nop             ; #4542 00
    nop             ; #4543 00
-   jmp l219a       ; #4544 c3 9a 21
+   jmp _FNEXT      ; #4544 c3 9a 21
 
 NFA_CR:          ; 4547
    .byte 2,"CR"
