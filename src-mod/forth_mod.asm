@@ -29,7 +29,7 @@ l2050:
 
 NFA_COLD:        ; 2185
    .byte 4,"COLD"
-   .word NFA_BYE
+   .word NFA_FORTH
 _COLD:           ; 218C - 21A1
    lxi d,N_FORTH   ; #2006 11 68 20
    lxi h,NFA_FORTH ; #2009 21 44 60
@@ -65,7 +65,7 @@ l2040:
    lhld l601c      ; #2044 2a 1c 60
    shld l601a      ; #2047 22 1a 60
    lxi b,l2050     ; #204a 01 50 20
-   jmp _FNEXT      ; #204d c3 9a 21
+   jmp _FNEXT
 
 _FCALL:
    lhld l601a      ; #218f 2a 1a 60
@@ -98,7 +98,7 @@ _EXIT:           ; 21A8 - 21B5
 
 NFA_BYE:
    .byte 3,"BYE"
-   .word NFA_TIB
+   .word NFA_EXIT
 _BYE:
    call _FCALL
    .word _LIT, 0xF800, _EXECUTE, _EXIT
@@ -115,7 +115,7 @@ N_FORTH:       ; 2068
 
 NFA_R0:          ; 2079
    .byte 2,"R0"
-   .word NFA_FORTH        ; 6044
+   .word NFA_BYE
 _R0:             ; 207E - 2083
    call __40     ; 207E
    .word l601c   ; 2081
@@ -273,7 +273,7 @@ l2183:
 
 NFA_EXECUTE:     ; 21B5
    .byte 7,"EXECUTE"
-   .word NFA_EXIT         ; 21A1
+   .word NFA_TIB
 _EXECUTE:        ; 21BF - 21C0
    ret
 
@@ -4257,15 +4257,15 @@ _NLIST:          ; 3BAC - 3BF5
    .word _TYPE            ; #3bd7 31B4 - TYPE
    .word _SPACES          ; #3bd9 32B9 - SPACES
    .word _N_3ELINK        ; #3bdb 3008 - N>LINK
-   .word __3EOUT          ; #3bdd 216B - >OUT
-   .word __40             ; #3bdf 2820 - @
-   .word _LIT             ; #3be1 28C7 - LIT
-   .word 40
-   .word _U_3C            ; #3be5 239D - U<
-   .word _N_3FBRANCH      ; #3be7 2934 - N?BRANCH
-   .word @3BED            ; #3be9 3BED
-   .word _CR              ; #3beb 454C - CR
-@3BED:
+;   .word __3EOUT          ; #3bdd 216B - >OUT
+;   .word __40             ; #3bdf 2820 - @
+;   .word _LIT             ; #3be1 28C7 - LIT
+;   .word 63
+;   .word _U_3C            ; #3be5 239D - U<
+;   .word _N_3FBRANCH      ; #3be7 2934 - N?BRANCH
+;   .word @3BED            ; #3be9 3BED
+;   .word _CR              ; #3beb 454C - CR
+;@3BED:
    .word _BRANCH          ; #3bed 2904 - BRANCH
    .word @3BAF            ; #3bef 3BAF
 @3BF1:
@@ -5711,11 +5711,11 @@ _STANDIO:        ; 4594 - None
    .word _LIT             ; #45bb 28C7 - LIT
    .word l600c            ; #45bd 600C
    .word __21             ; #45bf 2839 - !
-;   .word _LIT             ; #45c1 28C7 - LIT
-;   .word __28EMIT_29      ; #45c3 4539 - (EMIT)
-;   .word _LIT             ; #45c5 28C7 - LIT
-;   .word l600e            ; #45c7 600E
-;   .word __21             ; #45c9 2839 - !
+   .word _LIT             ; #45c1 28C7 - LIT
+   .word __28EMIT_29      ; #45c3 4539 - (EMIT)
+   .word _LIT             ; #45c5 28C7 - LIT
+   .word l600e            ; #45c7 600E
+   .word __21             ; #45c9 2839 - !
    .word _EXIT            ; #45cb 21A8 - EXIT
 
 ;!!!
