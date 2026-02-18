@@ -101,7 +101,7 @@ NFA_BYE:
    .word NFA_EXIT
 _BYE:
    call _FCALL
-   .word _LIT, 0xF800, _EXECUTE, _EXIT
+   .word _LIT, COLD_INIT, _EXECUTE
 
 N_FORTH:       ; 2068
    .byte 5,"FORTH"
@@ -5663,15 +5663,41 @@ _CR:             ; 454C - 4561
    .word _0_21            ; #455d 2898 - 0!
    .word _EXIT            ; #455f 21A8 - EXIT
 
+NFA_PROMPT:
+   .byte 6,"PROMPT"
+   .word NFA_CR
+_PROMPT:
+   call _FCALL
+; Буква режима работы
+   .word _STATE, __40, __3FBRANCH, @B2
+   .word _LIT, 0x43, _BRANCH, @B1  ; C - режим компиляции
+@B2:
+   .word _LIT, 0x49                ; I - режим интерпретации
+@B1:
+   .word _EMIT
+; Система счисления
+   .word _BASE            ; BASE
+   .word __40             ; @
+   .word _DUP             ; DUP
+   .word _DECIMAL         ; DECIMAL
+   .word _2               ; 2
+   .word __2ER            ; .R
+   .word _BASE            ; BASE
+   .word __21             ; !
+; Галочка с пробелом
+   .word _LIT, 0x3e       ; LIT ">"
+   .word _EMIT, _SPACE, _EXIT
+
 NFA_QUERY:       ; 4561
    .byte 5,"QUERY"
-   .word NFA_CR           ; 4547
+   .word NFA_PROMPT
 _QUERY:          ; 4569 - 458A
    call _FCALL            ; 4569
    .word _CR              ; #456c 454C - CR
-   .word _LIT             ; #456e 28C7 - LIT
-   .word 0x003E           ; #4570 003E
-   .word _EMIT            ; #4572 3189 - EMIT
+   .word _PROMPT
+;   .word _LIT             ; #456e 28C7 - LIT
+;   .word 0x003E           ; #4570 003E
+;   .word _EMIT            ; #4572 3189 - EMIT
    .word _TIB             ; #4574 2176 - TIB
    .word _LIT             ; #4576 28C7 - LIT
    .word 0x004F           ; #4578 004F
