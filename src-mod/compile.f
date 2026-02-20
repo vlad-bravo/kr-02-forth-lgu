@@ -2,7 +2,7 @@
 
 : HH ." HELLO, HABR!" COUNT TYPE ;
 
-: PROMPT2
+: PROMPT2 ( -- )
   \ Режим трансляции
   STATE @ IF C" C ELSE C" I THEN EMIT
   \ Система счисления

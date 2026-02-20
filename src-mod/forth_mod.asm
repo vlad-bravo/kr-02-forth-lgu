@@ -15,87 +15,86 @@
 
 l2000:
    jmp _COLD
-   jmp l2040       ; #2003 c3 40 20
+
+NFA_COLD:
+   .byte 4,"COLD"
+   .word NFA_FORTH
+_COLD:
+   lxi d,N_FORTH
+   lxi h,NFA_FORTH
+   mvi b,0x11
+@200e:
+   ldax d
+   mov m,a
+   inx h
+   inx d
+   dcr b
+   jnz @200e
+   mvi b,0x1a
+   lxi h,l6000
+   sub a
+@201c:
+   mov m,a
+   inx h
+   dcr b
+   jnz @201c
+   lhld l217b
+   shld l601c
+   lhld l217d
+   shld l601e
+   lhld l217f
+   shld l6020
+   lhld l2181
+   shld l6024
+   lhld l2183
+   shld l6022
+l2040:
+   lhld l601e
+   sphl
+   lhld l601c
+   shld l601a
+   lxi b,l2050     ; 
+   jmp _FNEXT
 
 l2050:
-   .word _LIT             ; #2050 28C7 - LIT
-   .word l6018            ; #2052 6018
-   .word __40             ; #2054 2820 - @
-   .word __3FDUP          ; #2056 2284 - ?DUP
-   .word __3FBRANCH       ; #2058 2916 - ?BRANCH
-   .word @2060            ; #205a 2060
+   .word _LIT             ; LIT
+   .word l6018            ; 
+   .word __40             ; @
+   .word __3FDUP          ; ?DUP
+   .word __3FBRANCH       ; ?BRANCH
+   .word @2060            ; 
    .word _EXECUTE, _EXIT
 @2060:
    .word _STANDIO, _TITLE, _DECIMAL, _QUIT
 
-NFA_COLD:        ; 2185
-   .byte 4,"COLD"
-   .word NFA_FORTH
-_COLD:           ; 218C - 21A1
-   lxi d,N_FORTH   ; #2006 11 68 20
-   lxi h,NFA_FORTH ; #2009 21 44 60
-   mvi b,0x11      ; #200c 06 11
-@200e:
-   ldax d          ; #200e 1a
-   mov m,a         ; #200f 77
-   inx h           ; #2010 23
-   inx d           ; #2011 13
-   dcr b           ; #2012 05
-   jnz @200e       ; #2013 c2 0e 20
-   mvi b,0x1a      ; #2016 06 1a
-   lxi h,l6000     ; #2018 21 00 60
-   sub a           ; #201b 97
-@201c:
-   mov m,a         ; #201c 77
-   inx h           ; #201d 23
-   dcr b           ; #201e 05
-   jnz @201c       ; #201f c2 1c 20
-   lhld l217b      ; #2022 2a 7b 21
-   shld l601c      ; #2025 22 1c 60
-   lhld l217d      ; #2028 2a 7d 21
-   shld l601e      ; #202b 22 1e 60
-   lhld l217f      ; #202e 2a 7f 21
-   shld l6020      ; #2031 22 20 60
-   lhld l2181      ; #2034 2a 81 21
-   shld l6024      ; #2037 22 24 60
-   lhld l2183      ; #203a 2a 83 21
-   shld l6022      ; #203d 22 22 60
-l2040:
-   lhld l601e      ; #2040 2a 1e 60
-   sphl            ; #2043 f9
-   lhld l601c      ; #2044 2a 1c 60
-   shld l601a      ; #2047 22 1a 60
-   lxi b,l2050     ; #204a 01 50 20
-   jmp _FNEXT
-
 _FCALL:
-   lhld l601a      ; #218f 2a 1a 60
-   dcx h           ; #2192 2b
-   mov m,b         ; #2193 70
-   dcx h           ; #2194 2b
-   mov m,c         ; #2195 71
-   shld l601a      ; #2196 22 1a 60
-   pop b           ; #2199 c1
+   lhld l601a
+   dcx h
+   mov m,b
+   dcx h
+   mov m,c
+   shld l601a
+   pop b
 _FNEXT:
-   ldax b          ; #219a 0a
-   mov l,a         ; #219b 6f
-   inx b           ; #219c 03
-   ldax b          ; #219d 0a
-   mov h,a         ; #219e 67
-   inx b           ; #219f 03
-   pchl            ; #21a0 e9
+   ldax b
+   mov l,a
+   inx b
+   ldax b
+   mov h,a
+   inx b
+   pchl
 
-NFA_EXIT:        ; 21A1
+NFA_EXIT:
    .byte 4,"EXIT"
-   .word NFA_COLD         ; 2185
-_EXIT:           ; 21A8 - 21B5
-   lhld l601a      ; #21a8 2a 1a 60
-   mov c,m         ; #21ab 4e
-   inx h           ; #21ac 23
-   mov b,m         ; #21ad 46
-   inx h           ; #21ae 23
-   shld l601a      ; #21af 22 1a 60
-   jmp _FNEXT      ; #21b2 c3 9a 21
+   .word NFA_COLD
+_EXIT:
+   lhld l601a
+   mov c,m
+   inx h
+   mov b,m
+   inx h
+   shld l601a
+   jmp _FNEXT
 
 N_FORTH:       ; 2068
    .byte 5,"FORTH"

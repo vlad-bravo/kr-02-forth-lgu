@@ -22,3 +22,6 @@ def action_else(context):
 
 def action_then(context):
     return 'then', None
+
+def action_bracket(context):
+    return '(', context.splitter.следующий(')')
