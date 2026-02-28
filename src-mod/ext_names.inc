@@ -80,3 +80,15 @@
 .def _OR m_OR
 .def _XOR m_XOR
 .def _NOT m_NOT
+
+; From life_manual.asm
+.def _VIDMEM l_VIDMEM
+.def _SIZE l_SIZE
+.def _WIDTH l_WIDTH
+.def _HEIGHT l_HEIGHT
+.def _LIVE l_LIVE
+.def _DEAD l_DEAD
+.def _WORLD l_WORLD
+.def _GX l_GX
+.def _GY l_GY
+.def _GN l_GN

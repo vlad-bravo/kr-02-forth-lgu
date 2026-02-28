@@ -23,5 +23,17 @@ def action_else(context):
 def action_then(context):
     return 'then', None
 
+def action_do(context):
+    return 'do', None
+
+def action_loop(context):
+    return 'loop', None
+
+def action_begin(context):
+    return 'begin', None
+
+def action_again(context):
+    return 'again', None
+
 def action_bracket(context):
     return '(', context.splitter.следующий(')')

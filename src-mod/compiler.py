@@ -11,6 +11,7 @@ HEADER = """
 .include "ext_names.inc"
 .include "..\\src\\ramdefs.inc"
 .include "..\\src\\monitor.inc"
+.include "life.inc"
 
 .SECTION "compiled" FREE
 
@@ -93,6 +94,8 @@ class Context:
         self.splitter = splitter
         self.state = 'interpret'
         self.prev_nfa = LFA_OUT
+        self.label_count = 0
+        self.label_stack = []
 
     def interpret(self, word):
         forth_word = find_word(word)
@@ -121,11 +124,41 @@ class Context:
         elif type == 'C"':
             result = f"   .word _LIT, 0x{ord(text):<7x}; C\" {text}"
         elif type == 'if':
-            result = f"   .word __3FBRANCH,@B1 ; ?BRANCH @B1"
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = f"   .word __3FBRANCH,@B{self.label_count} ; ?BRANCH @B{self.label_count}"
         elif type == 'else':
-            result = f"   .word _BRANCH,@B2    ; BRANCH @B2\n@B1:"
+            label = self.label_stack.pop()
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = f"   .word _BRANCH,@B{self.label_count}    ; BRANCH @B{self.label_count}\n@B{label}:"
         elif type == 'then':
-            result = f"@B2:"
+            label = self.label_stack.pop()
+            result = f"@B{label}:"
+        elif type == 'do':
+            self.label_count += 1
+            label = self.label_count
+            self.label_stack.append(self.label_count)
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = (
+                f"   .word __28_3FDO_29,@B{self.label_count} ; (?DO) @B{self.label_count}\n"
+                f"@B{label}:"
+            )
+        elif type == 'loop':
+            label2 = self.label_stack.pop()
+            label1 = self.label_stack.pop()
+            result = (
+                f"   .word __28LOOP_29,@B{label1} ; (LOOP) @B{label1}\n"
+                f"@B{label2}:"
+            )
+        elif type == 'begin':
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = f"@B{self.label_count}:"
+        elif type == 'again':
+            label = self.label_stack.pop()
+            result = f"   .word _BRANCH,@B{label}    ; BRANCH @B{label}"
         else:
             result = self.write_default(text)
         return result
@@ -141,6 +174,7 @@ class Context:
             f"   call _FCALL"
         )
         self.prev_nfa = new_nfa
+        self.label_count = 0
         return result
 
     def write_word(self, name):

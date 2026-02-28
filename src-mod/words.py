@@ -8,6 +8,10 @@ from actions import (
     action_else,
     action_then,
     action_bracket,
+    action_do,
+    action_loop,
+    action_begin,
+    action_again,
 )
 
 class Word:
@@ -26,9 +30,14 @@ WORDS = (
     Word('IF', action_if),
     Word('ELSE', action_else),
     Word('THEN', action_then),
+    Word('DO', action_do),
+    Word('LOOP', action_loop),
+    Word('BEGIN', action_begin),
+    Word('AGAIN', action_again),
     Word('0'),
     Word('1'),
     Word('2'),
+    Word('DEAD'),
     Word(''),
 )
 
