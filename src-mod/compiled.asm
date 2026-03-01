@@ -95,13 +95,12 @@ NFA_CHECK_2DN:
 _CHECK_2DN:
    call _FCALL
 ; ( x y -- )
+;    GETW LIVE = IF 1 GN +! THEN
    .word _GETW          ; GETW
    .word _LIVE          ; LIVE
    .word __3D           ; =
    .word __3FBRANCH,@B1 ; ?BRANCH @B1
-   .word _1             ; 1
-   .word _GN            ; GN
-   .word __2B_21        ; +!
+   .word _1_2B          ; 1+
 @B1:
    .word _EXIT          ; EXIT
 
@@ -112,9 +111,8 @@ NFA_COUNT_2DNEIGHBORS:
 _COUNT_2DNEIGHBORS:
    call _FCALL
 ; ( -- n )
+;    0 GN !
    .word _0             ; 0
-   .word _GN            ; GN
-   .word __21           ; !
    .word _GX            ; GX
    .word __40           ; @
    .word _1_2D          ; 1-
@@ -175,8 +173,8 @@ _COUNT_2DNEIGHBORS:
    .word _1_2B          ; 1+
    .word _CHECK_2DN     ; CHECK-N
 ; Нижний правый
-   .word _GN            ; GN
-   .word __40           ; @
+;    GN @
+;    GN @
    .word _EXIT          ; EXIT
 
 ; ===========================================
