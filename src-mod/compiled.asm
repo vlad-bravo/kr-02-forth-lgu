@@ -27,25 +27,10 @@ _CORNERS:
    .word __21           ; !
    .word _EXIT          ; EXIT
 
-NFA_5S:
-   .byte 2,"5S"
-   .word NFA_CORNERS
-_5S:
-   call _FCALL
-   .word _LIT,0x5       ; 5
-   .word _0             ; 0
-   .word __28_3FDO_29,@B2 ; (?DO) @B2
-@B1:
-   .word _LIVE          ; LIVE
-   .word _EMIT          ; EMIT
-   .word __28LOOP_29,@B1 ; (LOOP) @B1
-@B2:
-   .word _EXIT          ; EXIT
-
 ; Нормализация координат (зацикливание экрана)
 NFA_WRAPX:
    .byte 5,"WRAPX"
-   .word NFA_5S
+   .word NFA_CORNERS
 _WRAPX:
    call _FCALL
 ; ( x -- x' )
@@ -204,24 +189,19 @@ NFA_PROCESS_2DCELL:
 _PROCESS_2DCELL:
    call _FCALL
 ; ( x y -- )
+;    GY ! GX !                   \ Сохраняем координаты
+;    COUNT-NEIGHBORS             \ Считаем соседей (стек: n )
+;    GX @ GY @ GETW LIVE =       \ Проверяем, жива ли сама клетка (стек: n is_alive )
+   .word _2DUP          ; 2DUP
    .word _GY            ; GY
    .word __21           ; !
    .word _GX            ; GX
    .word __21           ; !
-; Сохраняем координаты
-   .word _COUNT_2DNEIGHBORS; COUNT-NEIGHBORS
-; Считаем соседей (стек: n )
-   .word _GX            ; GX
-   .word __40           ; @
-   .word _GY            ; GY
-   .word __40           ; @
    .word _GETW          ; GETW
    .word _LIVE          ; LIVE
    .word __3D           ; =
-; Проверяем, жива ли сама клетка (стек: n is_alive )
-   .word _OVER          ; OVER
-; ( n is_alive n )
-; Дублируем n для проверок
+   .word _COUNT_2DNEIGHBORS; COUNT-NEIGHBORS
+   .word _SWAP          ; SWAP
 ; Правила Жизни:
 ; Если клетка жива (is_alive = TRUE):
 ;   Выживает, если n=2 или n=3

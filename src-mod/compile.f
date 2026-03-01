@@ -7,8 +7,6 @@
   44 7FF3 !
 ;
 
-: 5S 5 0 DO LIVE EMIT LOOP ;
-
 \ Нормализация координат (зацикливание экрана)
 : WRAPX ( x -- x' )
     DUP WIDTH = IF DROP 0 THEN
@@ -46,11 +44,13 @@
 
 \ Обработка одной клетки
 : PROCESS-CELL ( x y -- )
-    GY ! GX !                   \ Сохраняем координаты
-    COUNT-NEIGHBORS             \ Считаем соседей (стек: n )
-    GX @ GY @ GETW LIVE =       \ Проверяем, жива ли сама клетка (стек: n is_alive )
-    
-    OVER ( n is_alive n )       \ Дублируем n для проверок
+\    GY ! GX !                   \ Сохраняем координаты
+\    COUNT-NEIGHBORS             \ Считаем соседей (стек: n )
+\    GX @ GY @ GETW LIVE =       \ Проверяем, жива ли сама клетка (стек: n is_alive )
+
+    2DUP GY ! GX ! GETW LIVE =
+    COUNT-NEIGHBORS
+    SWAP
     
     \ Правила Жизни:
     \ Если клетка жива (is_alive = TRUE):

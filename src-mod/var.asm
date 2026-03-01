@@ -8,7 +8,7 @@
 
 NFA_R0:          ; 2079
    .byte 2,"R0"
-   .word NFA_BYE
+   .word NFA_GN
 v_R0:             ; 207E - 2083
    call __40     ; 207E
    .word l601c   ; 2081
