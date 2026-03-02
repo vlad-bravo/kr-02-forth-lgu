@@ -7,10 +7,106 @@
 
 .SECTION "life_manual" FREE
 
+
+; : CHECK-LIVE ( N A -- N' A )
+;   DUP C@ LIVE = IF SWAP 1+ SWAP THEN
+; ;
+
+NFA_CHECKLIVE:
+   .byte 9,"CHECKLIVE"
+   .word NFA_BYE
+l_CHECKLIVE:
+   pop h    ; A
+   pop d    ; N
+   mov a,m
+   cpi 0x2A ; '*'
+   jnz @skip
+   inx d
+@skip:
+   push d   ; N'
+   push h   ; A
+   jmp _FNEXT
+
+; : COUNT-NEIGHBORS ( A -- N )
+;   0 SWAP           \ N A
+;   WIDTH - CHECKLIVE  \ Верхняя
+;        1- CHECKLIVE  \ Верхняя левая
+;        2+ CHECKLIVE  \ Верхняя правая
+;   WIDTH + CHECKLIVE  \ Правая
+;        2- CHECKLIVE  \ Левая
+;   WIDTH + CHECKLIVE  \ Нижняя левая
+;        1+ CHECKLIVE  \ Нижняя
+;        1+ CHECKLIVE  \ Нижняя правая
+;   DROP
+; ;
+
+NFA_COUNTNEIGHBORS:
+   .byte 14,"COUNTNEIGHBORS"
+   .word NFA_CHECKLIVE
+l_COUNTNEIGHBORS:
+   pop h
+   push b
+   lxi b,0xFFB2 ; -WIDTH
+   lxi d,0
+   dad b        ; Верхняя
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip1
+   inx d
+@skip1:
+   dcx h        ; Верхняя правая
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip2
+   inx d
+@skip2:
+   inx h
+   inx h        ; Верхняя правая
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip3
+   inx d
+@skip3:
+   lxi b,0x4E   ; WIDTH, 0x4e = 78 cols
+   dad b        ; Правая
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip4
+   inx d
+@skip4:
+   dcx h
+   dcx h        ; Левая
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip5
+   inx d
+@skip5:
+   dad b        ; Левая нижняя
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip6
+   inx d
+@skip6:
+   inx h        ; Нижняя
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip7
+   inx d
+@skip7:
+   inx h        ; Нижняя правая
+   mov a,m
+   cpi 0x2A     ; '*'
+   jnz @skip8
+   inx d
+@skip8:
+   pop b
+   push d
+   jmp _FNEXT
+
 ; Начало видеопамяти
 NFA_VIDMEM:
    .byte 6,"VIDMEM"
-   .word NFA_BYE
+   .word NFA_COUNTNEIGHBORS
 l_VIDMEM:
    call __40
    .word line00

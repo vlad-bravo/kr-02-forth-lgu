@@ -117,71 +117,14 @@ _FLD:
    .word _C_21          ; C!
    .word _EXIT          ; EXIT
 
-NFA_CHECK_2DLIVE:
-   .byte 10,"CHECK-LIVE"
-   .word NFA_FLD
-_CHECK_2DLIVE:
-   call _FCALL
-; ( N A -- N' A )
-   .word _DUP           ; DUP
-   .word _C_40          ; C@
-   .word _LIVE          ; LIVE
-   .word __3D           ; =
-   .word __3FBRANCH,@B1 ; ?BRANCH @B1
-   .word _SWAP          ; SWAP
-   .word _1_2B          ; 1+
-   .word _SWAP          ; SWAP
-@B1:
-   .word _EXIT          ; EXIT
-
-; Посчитать количество живых соседей для клетки с адресом A
-NFA_COUNT_2DNEIGHBORS:
-   .byte 15,"COUNT-NEIGHBORS"
-   .word NFA_CHECK_2DLIVE
-_COUNT_2DNEIGHBORS:
-   call _FCALL
-; ( A -- N )
-   .word _0             ; 0
-   .word _SWAP          ; SWAP
-; N A
-   .word _WIDTH         ; WIDTH
-   .word __2D           ; -
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Верхняя
-   .word _1_2D          ; 1-
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Верхняя левая
-   .word _2_2B          ; 2+
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Верхняя правая
-   .word _WIDTH         ; WIDTH
-   .word __2B           ; +
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Правая
-   .word _2_2D          ; 2-
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Левая
-   .word _WIDTH         ; WIDTH
-   .word __2B           ; +
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Нижняя левая
-   .word _1_2B          ; 1+
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Нижняя
-   .word _1_2B          ; 1+
-   .word _CHECK_2DLIVE  ; CHECK-LIVE
-; Нижняя правая
-   .word _DROP          ; DROP
-   .word _EXIT          ; EXIT
-
 NFA_PR_2DCELL:
    .byte 7,"PR-CELL"
-   .word NFA_COUNT_2DNEIGHBORS
+   .word NFA_FLD
 _PR_2DCELL:
    call _FCALL
 ; ( A -- )
    .word _DUP           ; DUP
-   .word _COUNT_2DNEIGHBORS; COUNT-NEIGHBORS
+   .word _COUNTNEIGHBORS; COUNTNEIGHBORS
    .word _OVER          ; OVER
    .word _C_40          ; C@
    .word _LIVE          ; LIVE
@@ -282,6 +225,7 @@ _INIT:
    .word __2B           ; +
    .word _C_21          ; C!
 ; (12, 9)
+   .word _DUP           ; DUP
    .word _LIT,0xB       ; B
    .word _LIT,0x8       ; 8
    .word _WIDTH         ; WIDTH
@@ -291,6 +235,107 @@ _INIT:
    .word __2B           ; +
    .word _C_21          ; C!
 ; (11, 8)
+   .word _DUP           ; DUP
+   .word _LIT,0x1A      ; 1A
+   .word _LIT,0xB       ; B
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (10, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0x1B      ; 1B
+   .word _LIT,0xB       ; B
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (11, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0x1C      ; 1C
+   .word _LIT,0xB       ; B
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (12, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0x1A      ; 1A
+   .word _LIT,0xA       ; A
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (12, 9)
+   .word _DUP           ; DUP
+   .word _LIT,0x1B      ; 1B
+   .word _LIT,0x9       ; 9
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (11, 8)
+   .word _DUP           ; DUP
+   .word _LIT,0xA       ; A
+   .word _LIT,0x1A      ; 1A
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (10, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0xB       ; B
+   .word _LIT,0x1A      ; 1A
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (11, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0xC       ; C
+   .word _LIT,0x1A      ; 1A
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (12, 10)
+   .word _DUP           ; DUP
+   .word _LIT,0xC       ; C
+   .word _LIT,0x19      ; 19
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (12, 9)
+   .word _DUP           ; DUP
+   .word _LIT,0xB       ; B
+   .word _LIT,0x18      ; 18
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+; (11, 8)
+   .word _DROP          ; DROP
    .word _EXIT          ; EXIT
 
 NFA_LIFE:

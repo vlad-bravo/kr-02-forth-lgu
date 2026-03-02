@@ -40,27 +40,9 @@
   C" D 7FF3 C!
 ;
 
-: CHECK-LIVE ( N A -- N' A )
-  DUP C@ LIVE = IF SWAP 1+ SWAP THEN
-;
-
-\ Посчитать количество живых соседей для клетки с адресом A
-: COUNT-NEIGHBORS ( A -- N )
-  0 SWAP           \ N A
-  WIDTH - CHECK-LIVE  \ Верхняя
-       1- CHECK-LIVE  \ Верхняя левая
-       2+ CHECK-LIVE  \ Верхняя правая
-  WIDTH + CHECK-LIVE  \ Правая
-       2- CHECK-LIVE  \ Левая
-  WIDTH + CHECK-LIVE  \ Нижняя левая
-       1+ CHECK-LIVE  \ Нижняя
-       1+ CHECK-LIVE  \ Нижняя правая
-  DROP
-;
-
 : PR-CELL ( A -- )
   DUP
-  COUNT-NEIGHBORS
+  COUNTNEIGHBORS
   OVER C@ LIVE =
     
   IF       \ Клетка жива
@@ -82,7 +64,21 @@
   DUP B A WIDTH * + VIDMEM + C! \ (11, 10)
   DUP C A WIDTH * + VIDMEM + C! \ (12, 10)
   DUP C 9 WIDTH * + VIDMEM + C! \ (12, 9)
-      B 8 WIDTH * + VIDMEM + C! \ (11, 8)
+  DUP B 8 WIDTH * + VIDMEM + C! \ (11, 8)
+
+  DUP 1A B WIDTH * + VIDMEM + C! \ (10, 10)
+  DUP 1B B WIDTH * + VIDMEM + C! \ (11, 10)
+  DUP 1C B WIDTH * + VIDMEM + C! \ (12, 10)
+  DUP 1A A WIDTH * + VIDMEM + C! \ (12, 9)
+  DUP 1B 9 WIDTH * + VIDMEM + C! \ (11, 8)
+
+  DUP A 1A WIDTH * + VIDMEM + C! \ (10, 10)
+  DUP B 1A WIDTH * + VIDMEM + C! \ (11, 10)
+  DUP C 1A WIDTH * + VIDMEM + C! \ (12, 10)
+  DUP C 19 WIDTH * + VIDMEM + C! \ (12, 9)
+  DUP B 18 WIDTH * + VIDMEM + C! \ (11, 8)
+
+  DROP
 ;
 
 : LIFE
