@@ -127,6 +127,10 @@ class Context:
             self.label_count += 1
             self.label_stack.append(self.label_count)
             result = f"   .word __3FBRANCH,@B{self.label_count} ; ?BRANCH @B{self.label_count}"
+        elif type == 'ifnot':
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = f"   .word _N_3FBRANCH,@B{self.label_count} ; N?BRANCH @B{self.label_count}"
         elif type == 'else':
             label = self.label_stack.pop()
             self.label_count += 1
@@ -150,6 +154,13 @@ class Context:
             label1 = self.label_stack.pop()
             result = (
                 f"   .word __28LOOP_29,@B{label1} ; (LOOP) @B{label1}\n"
+                f"@B{label2}:"
+            )
+        elif type == '+loop':
+            label2 = self.label_stack.pop()
+            label1 = self.label_stack.pop()
+            result = (
+                f"   .word __28_2BLOOP_29,@B{label1} ; (+LOOP) @B{label1}\n"
                 f"@B{label2}:"
             )
         elif type == 'begin':

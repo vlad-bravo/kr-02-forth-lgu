@@ -17,6 +17,9 @@ def action_cquot(context):
 def action_if(context):
     return 'if', None
 
+def action_ifnot(context):
+    return 'ifnot', None
+
 def action_else(context):
     return 'else', None
 
@@ -28,6 +31,9 @@ def action_do(context):
 
 def action_loop(context):
     return 'loop', None
+
+def action_ploop(context):
+    return '+loop', None
 
 def action_begin(context):
     return 'begin', None

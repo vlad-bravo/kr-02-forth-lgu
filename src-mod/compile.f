@@ -7,109 +7,112 @@
   44 7FF3 !
 ;
 
-\ Нормализация координат (зацикливание экрана)
-: WRAPX ( x -- x' )
-    DUP WIDTH = IF DROP 0 THEN
-    DUP 0< IF WIDTH + THEN
-;
+: FLD
+\ Перебор всех ячеек экрана
+\    HEIGHT 0 DO
+\        WIDTH 0 DO
+\            C" . J WIDTH * I + VIDMEM + C!
+\        LOOP
+\    LOOP
 
-: WRAPY ( y -- y' )
-    DUP HEIGHT = IF DROP 0 THEN
-    DUP 0< IF HEIGHT + THEN ;
+\ Перебор ячеек экрана по типам
+\ A, B, C, D - по углам экрана
+\ T, L, R, B - верхняя, левая, правая, нижняя границы
+\ . - все внутренние ячейки
+  C" A 76D0 C!
+  WIDTH 1- 1 DO
+    C" T I 76D0 + C!
+  LOOP
+  C" B 771D C!
 
-\ Получить значение клетки из буфера WORLD по координатам x, y
-: GETW ( x y -- char )
-    WRAPY WIDTH * SWAP WRAPX + WORLD + C@ ;
-
-\ Проверить соседа и увеличить счетчик, если он жив
-: CHECK-N ( x y -- )
-\    GETW LIVE = IF 1 GN +! THEN
-    GETW LIVE = IF 1+ THEN
-;
-
-\ Посчитать количество живых соседей для клетки с координатами GX, GY
-: COUNT-NEIGHBORS ( -- n )
-\    0 GN !
-    0
-    GX @ 1- GY @ 1- CHECK-N   \ Верхний левый
-    GX @    GY @ 1- CHECK-N   \ Верхний
-    GX @ 1+ GY @ 1- CHECK-N   \ Верхний правый
-    GX @ 1- GY @    CHECK-N   \ Левый
-    GX @ 1+ GY @    CHECK-N   \ Правый
-    GX @ 1- GY @ 1+ CHECK-N   \ Нижний левый
-    GX @    GY @ 1+ CHECK-N   \ Нижний
-    GX @ 1+ GY @ 1+ CHECK-N   \ Нижний правый
-\    GN @
-\    GN @
-;
-
-\ ===========================================
-\ Основная логика
-\ ===========================================
-
-\ Обработка одной клетки
-: PROCESS-CELL ( x y -- )
-\    GY ! GX !                   \ Сохраняем координаты
-\    COUNT-NEIGHBORS             \ Считаем соседей (стек: n )
-\    GX @ GY @ GETW LIVE =       \ Проверяем, жива ли сама клетка (стек: n is_alive )
-
-    2DUP GY ! GX ! GETW LIVE =
-    COUNT-NEIGHBORS
-    SWAP
-    
-    \ Правила Жизни:
-    \ Если клетка жива (is_alive = TRUE):
-    \   Выживает, если n=2 или n=3
-    \ Если клетка мертва:
-    \   Рождается, если n=3
-    
-    IF   ( n n -- )             \ Клетка жива
-        DUP 2 = SWAP 3 = OR     \ ( n (2|3) )
-        IF LIVE ELSE DEAD THEN
-    ELSE ( n -- )               \ Клетка мертва
-        3 = IF LIVE ELSE DEAD THEN
-    THEN
-    
-    \ Записываем результат в видеопамять
-    GX @ GY @ WIDTH * + VIDMEM + C! ;
-
-\ Один шаг эволюции
-: GENERATION ( -- )
-    HEIGHT 0 DO
-        WIDTH 0 DO
-            J I PROCESS-CELL    \ J = Y, I = X
-        LOOP
+  HEIGHT 1- 1 DO
+    C" L I WIDTH * 76D0 + C!
+    WIDTH 1- 1 DO
+      C" . J WIDTH * I + 76D0 + C!
     LOOP
-    \ После отрисовки копируем видеопамять обратно в буфер WORLD
-    VIDMEM WORLD SIZE CMOVE ;
+    C" R I WIDTH * 771D + C!
+  LOOP
 
-\ ===========================================
-\ Инициализация и запуск
-\ ===========================================
+  C" C 7FA6 C!
+  WIDTH 1- 1 DO
+    C" B I 7FA6 + C!
+  LOOP
+  C" D 7FF3 C!
+;
 
-\ Очистка буфера и экрана, установка начальной конфигурации
-: INIT ( -- )
-    \ Заполняем пробелами
-    WORLD SIZE DEAD FILL
-    VIDMEM SIZE DEAD FILL
+: CHECK-LIVE ( N A -- N' A )
+  DUP C@ LIVE = IF SWAP 1+ SWAP THEN
+;
+
+\ Посчитать количество живых соседей для клетки с адресом A
+: COUNT-NEIGHBORS ( A -- N )
+  0 SWAP           \ N A
+  WIDTH - CHECK-LIVE  \ Верхняя
+       1- CHECK-LIVE  \ Верхняя левая
+       2+ CHECK-LIVE  \ Верхняя правая
+  WIDTH + CHECK-LIVE  \ Правая
+       2- CHECK-LIVE  \ Левая
+  WIDTH + CHECK-LIVE  \ Нижняя левая
+       1+ CHECK-LIVE  \ Нижняя
+       1+ CHECK-LIVE  \ Нижняя правая
+  DROP
+;
+
+: PR-CELL ( A -- )
+  DUP
+  COUNT-NEIGHBORS
+  OVER C@ LIVE =
     
-    \ Рисуем планер (Glider) в центре экрана
-    \ Координаты примерно (10, 10)
-    A A WIDTH * + WORLD + LIVE SWAP C! \ (10, 10)
-    B A WIDTH * + WORLD + LIVE SWAP C! \ (11, 10)
-    C A WIDTH * + WORLD + LIVE SWAP C! \ (12, 10)
-    C 9 WIDTH * + WORLD + LIVE SWAP C! \ (12, 9)
-    B 8 WIDTH * + WORLD + LIVE SWAP C! \ (11, 8)
-    
-    \ Выводим стартовую конфигурацию на экран
-    WORLD VIDMEM SIZE CMOVE ;
+  IF       \ Клетка жива
+    DUP 2 = SWAP 3 = OR
+    IF DROP ELSE PDEAD @ ! PDEAD @ 2+ PDEAD ! THEN
+  ELSE     \ Клетка мертва
+    3 = IF PLIVE @ ! PLIVE @ 2+ PLIVE ! ELSE DROP THEN
+  THEN
+;
 
-\ Главный цикл
-: LIFE ( -- )
-    INIT
-    BEGIN
-        GENERATION
-    AGAIN
+: INIT
+  \ Заполняем пробелами
+  VIDMEM SIZE DEAD FILL
+    
+  \ Рисуем планер (Glider) в центре экрана
+  \ Координаты примерно (10, 10)
+  LIVE
+  DUP A A WIDTH * + VIDMEM + C! \ (10, 10)
+  DUP B A WIDTH * + VIDMEM + C! \ (11, 10)
+  DUP C A WIDTH * + VIDMEM + C! \ (12, 10)
+  DUP C 9 WIDTH * + VIDMEM + C! \ (12, 9)
+      B 8 WIDTH * + VIDMEM + C! \ (11, 8)
+;
+
+: LIFE
+  INIT
+  BEGIN
+    \ Указатели на стеки зарождающихся и умирающих ячеек
+    SLIVE PLIVE !
+    SDEAD PDEAD !
+  \  C" A 76D0 C!
+  \  WIDTH 1- 1 DO
+  \    C" T I 76D0 + C!
+  \  LOOP
+  \  C" B 771D C!
+
+    HEIGHT 1- 1 DO
+  \    C" L I WIDTH * 76D0 + C!
+      WIDTH 1- 1 DO
+        J WIDTH * I + 76D0 + PR-CELL
+      LOOP
+  \    C" R I WIDTH * 771D + C!
+    LOOP
+
+  \  C" C 7FA6 C!
+  \  WIDTH 1- 1 DO
+  \    C" B I 7FA6 + C!
+  \  LOOP
+  \  C" D 7FF3 C!
+    PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
+    PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
+  AGAIN
 ;
 
 : HH ." HELLO, HABR!" COUNT TYPE ;

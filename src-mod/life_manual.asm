@@ -55,36 +55,31 @@ l_DEAD:
    call __40
    .word 0x20  ; 20 = ' '
 
-; Создаем буфер в оперативной памяти для хранения текущего поколения
-; CREATE WORLD SIZE ALLOT
-NFA_WORLD:
-   .byte 5,"WORLD"
+NFA_SLIVE:
+   .byte 5,"SLIVE"
    .word NFA_DEAD
-l_WORLD:
+l_SLIVE:
    call __40
    .word 0x5000
 
-; VARIABLE GX \ Координата X текущей клетки
-NFA_GX:
-   .byte 2,"GX"
-   .word NFA_WORLD
-l_GX:
+NFA_SDEAD:
+   .byte 5,"SDEAD"
+   .word NFA_SLIVE
+l_SDEAD:
    call __40
-   .word 0x5ff0
+   .word 0x5800
 
-; VARIABLE GY \ Координата Y текущей клетки
-NFA_GY:
-   .byte 2,"GY"
-   .word NFA_GX
-l_GY:
+NFA_PLIVE:
+   .byte 5,"PLIVE"
+   .word NFA_SDEAD
+l_PLIVE:
    call __40
    .word 0x5ff2
 
-; VARIABLE GN \ Количество соседей
-NFA_GN:
-   .byte 2,"GN"
-   .word NFA_GY
-l_GN:
+NFA_PDEAD:
+   .byte 5,"PDEAD"
+   .word NFA_PLIVE
+l_PDEAD:
    call __40
    .word 0x5ff4
 

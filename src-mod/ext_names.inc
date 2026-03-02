@@ -88,7 +88,7 @@
 .def _HEIGHT l_HEIGHT
 .def _LIVE l_LIVE
 .def _DEAD l_DEAD
-.def _WORLD l_WORLD
-.def _GX l_GX
-.def _GY l_GY
-.def _GN l_GN
+.def _SLIVE l_SLIVE
+.def _SDEAD l_SDEAD
+.def _PLIVE l_PLIVE
+.def _PDEAD l_PDEAD
