@@ -27,9 +27,39 @@ _CORNERS:
    .word __21           ; !
    .word _EXIT          ; EXIT
 
+NFA_OPT_2DLOOP:
+   .byte 8,"OPT-LOOP"
+   .word NFA_CORNERS
+_OPT_2DLOOP:
+   call _FCALL
+   .word _HEIGHT        ; HEIGHT
+   .word _1_2D          ; 1-
+   .word _1             ; 1
+   .word __28_3FDO_29,@B2 ; (?DO) @B2
+@B1:
+   .word _WIDTH         ; WIDTH
+   .word _1_2D          ; 1-
+   .word _1             ; 1
+   .word __28_3FDO_29,@B4 ; (?DO) @B4
+@B3:
+   .word _J             ; J
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word _I             ; I
+   .word __2B           ; +
+   .word _LIT,0x76D0    ; 76D0
+   .word __2B           ; +
+   .word __2E           ; .
+   .word __28LOOP_29,@B3 ; (LOOP) @B3
+@B4:
+   .word _CR            ; CR
+   .word __28LOOP_29,@B1 ; (LOOP) @B1
+@B2:
+   .word _EXIT          ; EXIT
+
 NFA_FLD:
    .byte 3,"FLD"
-   .word NFA_CORNERS
+   .word NFA_OPT_2DLOOP
 _FLD:
    call _FCALL
 ; Перебор всех ячеек экрана
@@ -42,139 +72,77 @@ _FLD:
 ; A, B, C, D - по углам экрана
 ; T, L, R, B - верхняя, левая, правая, нижняя границы
 ; . - все внутренние ячейки
+   .word _VIDMEM        ; VIDMEM
    .word _LIT, 0x41     ; C" A
-   .word _LIT,0x76D0    ; 76D0
+   .word _OVER          ; OVER
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
+   .word _LIT, 0x54     ; C" T
+   .word _SWAP          ; SWAP
    .word _WIDTH         ; WIDTH
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B2 ; (?DO) @B2
 @B1:
-   .word _LIT, 0x54     ; C" T
-   .word _I             ; I
-   .word _LIT,0x76D0    ; 76D0
-   .word __2B           ; +
+   .word _2DUP          ; 2DUP
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
    .word __28LOOP_29,@B1 ; (LOOP) @B1
 @B2:
+   .word _PRESS         ; PRESS
    .word _LIT, 0x42     ; C" B
-   .word _LIT,0x771D    ; 771D
+   .word _OVER          ; OVER
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
    .word _HEIGHT        ; HEIGHT
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B4 ; (?DO) @B4
 @B3:
    .word _LIT, 0x4c     ; C" L
-   .word _I             ; I
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word _LIT,0x76D0    ; 76D0
-   .word __2B           ; +
+   .word _OVER          ; OVER
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
+   .word _LIT, 0x2e     ; C" .
+   .word _SWAP          ; SWAP
    .word _WIDTH         ; WIDTH
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B6 ; (?DO) @B6
 @B5:
-   .word _LIT, 0x2e     ; C" .
-   .word _J             ; J
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word _I             ; I
-   .word __2B           ; +
-   .word _LIT,0x76D0    ; 76D0
-   .word __2B           ; +
+   .word _2DUP          ; 2DUP
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
    .word __28LOOP_29,@B5 ; (LOOP) @B5
 @B6:
+   .word _PRESS         ; PRESS
    .word _LIT, 0x52     ; C" R
-   .word _I             ; I
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word _LIT,0x771D    ; 771D
-   .word __2B           ; +
+   .word _OVER          ; OVER
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
    .word __28LOOP_29,@B3 ; (LOOP) @B3
 @B4:
    .word _LIT, 0x43     ; C" C
-   .word _LIT,0x7FA6    ; 7FA6
+   .word _OVER          ; OVER
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
+   .word _LIT, 0x42     ; C" B
+   .word _SWAP          ; SWAP
    .word _WIDTH         ; WIDTH
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B8 ; (?DO) @B8
 @B7:
-   .word _LIT, 0x42     ; C" B
-   .word _I             ; I
-   .word _LIT,0x7FA6    ; 7FA6
-   .word __2B           ; +
+   .word _2DUP          ; 2DUP
    .word _C_21          ; C!
+   .word _1_2B          ; 1+
    .word __28LOOP_29,@B7 ; (LOOP) @B7
 @B8:
+   .word _PRESS         ; PRESS
    .word _LIT, 0x44     ; C" D
-   .word _LIT,0x7FF3    ; 7FF3
-   .word _C_21          ; C!
-   .word _EXIT          ; EXIT
-
-NFA_PR_2DCELL:
-   .byte 7,"PR-CELL"
-   .word NFA_FLD
-_PR_2DCELL:
-   call _FCALL
-; ( A -- )
-   .word _DUP           ; DUP
-   .word _COUNTNEIGHBORS; COUNTNEIGHBORS
-   .word _OVER          ; OVER
-   .word _C_40          ; C@
-   .word _LIVE          ; LIVE
-   .word __3D           ; =
-   .word __3FBRANCH,@B1 ; ?BRANCH @B1
-; Клетка жива
-   .word _DUP           ; DUP
-   .word _2             ; 2
-   .word __3D           ; =
    .word _SWAP          ; SWAP
-   .word _LIT,0x3       ; 3
-   .word __3D           ; =
-   .word _OR            ; OR
-   .word __3FBRANCH,@B2 ; ?BRANCH @B2
-   .word _DROP          ; DROP
-   .word _BRANCH,@B3    ; BRANCH @B3
-@B2:
-   .word _PDEAD         ; PDEAD
-   .word __40           ; @
-   .word __21           ; !
-   .word _PDEAD         ; PDEAD
-   .word __40           ; @
-   .word _2_2B          ; 2+
-   .word _PDEAD         ; PDEAD
-   .word __21           ; !
-@B3:
-   .word _BRANCH,@B4    ; BRANCH @B4
-@B1:
-; Клетка мертва
-   .word _LIT,0x3       ; 3
-   .word __3D           ; =
-   .word __3FBRANCH,@B5 ; ?BRANCH @B5
-   .word _PLIVE         ; PLIVE
-   .word __40           ; @
-   .word __21           ; !
-   .word _PLIVE         ; PLIVE
-   .word __40           ; @
-   .word _2_2B          ; 2+
-   .word _PLIVE         ; PLIVE
-   .word __21           ; !
-   .word _BRANCH,@B6    ; BRANCH @B6
-@B5:
-   .word _DROP          ; DROP
-@B6:
-@B4:
+   .word _C_21          ; C!
    .word _EXIT          ; EXIT
 
 NFA_INIT:
    .byte 4,"INIT"
-   .word NFA_PR_2DCELL
+   .word NFA_FLD
 _INIT:
    call _FCALL
 ; Заполняем пробелами
@@ -338,54 +306,101 @@ _INIT:
    .word _DROP          ; DROP
    .word _EXIT          ; EXIT
 
+NFA_PR_2DCELL:
+   .byte 7,"PR-CELL"
+   .word NFA_INIT
+_PR_2DCELL:
+   call _FCALL
+; ( A -- )
+   .word _DUP           ; DUP
+   .word _COUNTNEIGHBORS; COUNTNEIGHBORS
+   .word _OVER          ; OVER
+   .word _C_40          ; C@
+   .word _LIVE          ; LIVE
+   .word __3D           ; =
+   .word __3FBRANCH,@B1 ; ?BRANCH @B1
+; Клетка жива
+   .word _DUP           ; DUP
+   .word _2             ; 2
+   .word __3D           ; =
+   .word _SWAP          ; SWAP
+   .word _LIT,0x3       ; 3
+   .word __3D           ; =
+   .word _OR            ; OR
+   .word __3FBRANCH,@B2 ; ?BRANCH @B2
+   .word _DROP          ; DROP
+   .word _BRANCH,@B3    ; BRANCH @B3
+@B2:
+   .word _PDEAD         ; PDEAD
+   .word __40           ; @
+   .word __21           ; !
+   .word _PDEAD         ; PDEAD
+   .word __40           ; @
+   .word _2_2B          ; 2+
+   .word _PDEAD         ; PDEAD
+   .word __21           ; !
+@B3:
+   .word _BRANCH,@B4    ; BRANCH @B4
+@B1:
+; Клетка мертва
+   .word _LIT,0x3       ; 3
+   .word __3D           ; =
+   .word __3FBRANCH,@B5 ; ?BRANCH @B5
+   .word _PLIVE         ; PLIVE
+   .word __40           ; @
+   .word __21           ; !
+   .word _PLIVE         ; PLIVE
+   .word __40           ; @
+   .word _2_2B          ; 2+
+   .word _PLIVE         ; PLIVE
+   .word __21           ; !
+   .word _BRANCH,@B6    ; BRANCH @B6
+@B5:
+   .word _DROP          ; DROP
+@B6:
+@B4:
+   .word _EXIT          ; EXIT
+
 NFA_LIFE:
    .byte 4,"LIFE"
-   .word NFA_INIT
+   .word NFA_PR_2DCELL
 _LIFE:
    call _FCALL
    .word _INIT          ; INIT
+; Первая ячейка поля - во второй строке, второй колонке
+   .word _VIDMEM        ; VIDMEM
+   .word _WIDTH         ; WIDTH
+   .word __2B           ; +
+   .word _1_2B          ; 1+
 @B1:
-; Указатели на стеки зарождающихся и умирающих ячеек
+; Указатели на массивы зарождающихся и умирающих ячеек
    .word _SLIVE         ; SLIVE
    .word _PLIVE         ; PLIVE
    .word __21           ; !
    .word _SDEAD         ; SDEAD
    .word _PDEAD         ; PDEAD
    .word __21           ; !
-;  C" A 76D0 C!
-;  WIDTH 1- 1 DO
-;    C" T I 76D0 + C!
-;  LOOP
-;  C" B 771D C!
+; Обработка поля кроме крайних строк и колонок
+   .word _DUP           ; DUP
    .word _HEIGHT        ; HEIGHT
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B3 ; (?DO) @B3
 @B2:
-;    C" L I WIDTH * 76D0 + C!
    .word _WIDTH         ; WIDTH
-   .word _1_2D          ; 1-
-   .word _1             ; 1
+   .word _2             ; 2
    .word __28_3FDO_29,@B5 ; (?DO) @B5
 @B4:
-   .word _J             ; J
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word _I             ; I
-   .word __2B           ; +
-   .word _LIT,0x76D0    ; 76D0
-   .word __2B           ; +
+   .word _DUP           ; DUP
    .word _PR_2DCELL     ; PR-CELL
+   .word _1_2B          ; 1+
    .word __28LOOP_29,@B4 ; (LOOP) @B4
 @B5:
-;    C" R I WIDTH * 771D + C!
+   .word _2_2B          ; 2+
+; Пропуск последней ячейки текущей строки и первой ячейки следующей строки
    .word __28LOOP_29,@B2 ; (LOOP) @B2
 @B3:
-;  C" C 7FA6 C!
-;  WIDTH 1- 1 DO
-;    C" B I 7FA6 + C!
-;  LOOP
-;  C" D 7FF3 C!
+   .word _DROP          ; DROP
+; Отображение подготовленных данных о рождённых и умерших ячейках
    .word _PLIVE         ; PLIVE
    .word __40           ; @
    .word _SLIVE         ; SLIVE

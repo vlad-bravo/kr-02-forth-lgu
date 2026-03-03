@@ -7,6 +7,15 @@
   44 7FF3 !
 ;
 
+: OPT-LOOP
+    HEIGHT 1- 1 DO
+      WIDTH 1- 1 DO
+        J WIDTH * I + 76D0 + .
+      LOOP
+      CR
+    LOOP
+;
+
 : FLD
 \ Перебор всех ячеек экрана
 \    HEIGHT 0 DO
@@ -19,38 +28,32 @@
 \ A, B, C, D - по углам экрана
 \ T, L, R, B - верхняя, левая, правая, нижняя границы
 \ . - все внутренние ячейки
-  C" A 76D0 C!
-  WIDTH 1- 1 DO
-    C" T I 76D0 + C!
+  VIDMEM
+  C" A OVER C! 1+
+  C" T SWAP
+  WIDTH 2 DO
+    2DUP C! 1+
   LOOP
-  C" B 771D C!
+  PRESS
+  C" B OVER C! 1+
 
-  HEIGHT 1- 1 DO
-    C" L I WIDTH * 76D0 + C!
-    WIDTH 1- 1 DO
-      C" . J WIDTH * I + 76D0 + C!
+  HEIGHT 2 DO
+    C" L OVER C! 1+
+    C" . SWAP
+    WIDTH 2 DO
+      2DUP C! 1+
     LOOP
-    C" R I WIDTH * 771D + C!
+    PRESS
+    C" R OVER C! 1+
   LOOP
 
-  C" C 7FA6 C!
-  WIDTH 1- 1 DO
-    C" B I 7FA6 + C!
+  C" C OVER C! 1+
+  C" B SWAP
+  WIDTH 2 DO
+    2DUP C! 1+
   LOOP
-  C" D 7FF3 C!
-;
-
-: PR-CELL ( A -- )
-  DUP
-  COUNTNEIGHBORS
-  OVER C@ LIVE =
-    
-  IF       \ Клетка жива
-    DUP 2 = SWAP 3 = OR
-    IF DROP ELSE PDEAD @ ! PDEAD @ 2+ PDEAD ! THEN
-  ELSE     \ Клетка мертва
-    3 = IF PLIVE @ ! PLIVE @ 2+ PLIVE ! ELSE DROP THEN
-  THEN
+  PRESS
+  C" D SWAP C!
 ;
 
 : INIT
@@ -81,31 +84,39 @@
   DROP
 ;
 
+: PR-CELL ( A -- )
+  DUP
+  COUNTNEIGHBORS
+  OVER C@ LIVE =
+    
+  IF       \ Клетка жива
+    DUP 2 = SWAP 3 = OR
+    IF DROP ELSE PDEAD @ ! PDEAD @ 2+ PDEAD ! THEN
+  ELSE     \ Клетка мертва
+    3 = IF PLIVE @ ! PLIVE @ 2+ PLIVE ! ELSE DROP THEN
+  THEN
+;
+
 : LIFE
   INIT
+  \ Первая ячейка поля - во второй строке, второй колонке
+  VIDMEM WIDTH + 1+
   BEGIN
-    \ Указатели на стеки зарождающихся и умирающих ячеек
+    \ Указатели на массивы зарождающихся и умирающих ячеек
     SLIVE PLIVE !
     SDEAD PDEAD !
-  \  C" A 76D0 C!
-  \  WIDTH 1- 1 DO
-  \    C" T I 76D0 + C!
-  \  LOOP
-  \  C" B 771D C!
 
-    HEIGHT 1- 1 DO
-  \    C" L I WIDTH * 76D0 + C!
-      WIDTH 1- 1 DO
-        J WIDTH * I + 76D0 + PR-CELL
+    \ Обработка поля кроме крайних строк и колонок
+    DUP
+    HEIGHT 2 DO
+      WIDTH 2 DO
+        DUP PR-CELL 1+
       LOOP
-  \    C" R I WIDTH * 771D + C!
+      2+ \ Пропуск последней ячейки текущей строки и первой ячейки следующей строки
     LOOP
+    DROP
 
-  \  C" C 7FA6 C!
-  \  WIDTH 1- 1 DO
-  \    C" B I 7FA6 + C!
-  \  LOOP
-  \  C" D 7FF3 C!
+    \ Отображение подготовленных данных о рождённых и умерших ячейках
     PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
     PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
   AGAIN
