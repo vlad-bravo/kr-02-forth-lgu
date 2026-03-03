@@ -8,60 +8,12 @@
 .SECTION "compiled" FREE
 
 ; Определение слов для последующей компиляции
-NFA_CORNERS:
-   .byte 7,"CORNERS"
-   .word NFA_EXIT
-_CORNERS:
-   call _FCALL
-   .word _LIT,0x41      ; 41
-   .word _LIT,0x76D0    ; 76D0
-   .word __21           ; !
-   .word _LIT,0x42      ; 42
-   .word _LIT,0x771D    ; 771D
-   .word __21           ; !
-   .word _LIT,0x43      ; 43
-   .word _LIT,0x7FA6    ; 7FA6
-   .word __21           ; !
-   .word _LIT,0x44      ; 44
-   .word _LIT,0x7FF3    ; 7FF3
-   .word __21           ; !
-   .word _EXIT          ; EXIT
-
-NFA_OPT_2DLOOP:
-   .byte 8,"OPT-LOOP"
-   .word NFA_CORNERS
-_OPT_2DLOOP:
-   call _FCALL
-   .word _HEIGHT        ; HEIGHT
-   .word _1_2D          ; 1-
-   .word _1             ; 1
-   .word __28_3FDO_29,@B2 ; (?DO) @B2
-@B1:
-   .word _WIDTH         ; WIDTH
-   .word _1_2D          ; 1-
-   .word _1             ; 1
-   .word __28_3FDO_29,@B4 ; (?DO) @B4
-@B3:
-   .word _J             ; J
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word _I             ; I
-   .word __2B           ; +
-   .word _LIT,0x76D0    ; 76D0
-   .word __2B           ; +
-   .word __2E           ; .
-   .word __28LOOP_29,@B3 ; (LOOP) @B3
-@B4:
-   .word _CR            ; CR
-   .word __28LOOP_29,@B1 ; (LOOP) @B1
-@B2:
-   .word _EXIT          ; EXIT
-
 NFA_FLD:
    .byte 3,"FLD"
-   .word NFA_OPT_2DLOOP
+   .word NFA_EXIT
 _FLD:
    call _FCALL
+; ( -- )
 ; Перебор всех ячеек экрана
 ;    HEIGHT 0 DO
 ;        WIDTH 0 DO
@@ -145,6 +97,7 @@ NFA_INIT:
    .word NFA_FLD
 _INIT:
    call _FCALL
+; ( -- )
 ; Заполняем пробелами
    .word _VIDMEM        ; VIDMEM
    .word _SIZE          ; SIZE
@@ -212,7 +165,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (10, 10)
    .word _DUP           ; DUP
    .word _LIT,0x1B      ; 1B
    .word _LIT,0xB       ; B
@@ -222,7 +174,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 10)
    .word _DUP           ; DUP
    .word _LIT,0x1C      ; 1C
    .word _LIT,0xB       ; B
@@ -232,7 +183,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 10)
    .word _DUP           ; DUP
    .word _LIT,0x1A      ; 1A
    .word _LIT,0xA       ; A
@@ -242,7 +192,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 9)
    .word _DUP           ; DUP
    .word _LIT,0x1B      ; 1B
    .word _LIT,0x9       ; 9
@@ -252,7 +201,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 8)
    .word _DUP           ; DUP
    .word _LIT,0xA       ; A
    .word _LIT,0x1A      ; 1A
@@ -262,7 +210,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (10, 10)
    .word _DUP           ; DUP
    .word _LIT,0xB       ; B
    .word _LIT,0x1A      ; 1A
@@ -272,7 +219,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 10)
    .word _DUP           ; DUP
    .word _LIT,0xC       ; C
    .word _LIT,0x1A      ; 1A
@@ -282,7 +228,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 10)
    .word _DUP           ; DUP
    .word _LIT,0xC       ; C
    .word _LIT,0x19      ; 19
@@ -292,7 +237,6 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 9)
    .word _DUP           ; DUP
    .word _LIT,0xB       ; B
    .word _LIT,0x18      ; 18
@@ -302,10 +246,11 @@ _INIT:
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 8)
    .word _DROP          ; DROP
    .word _EXIT          ; EXIT
 
+; Анализ состояния ячейки
+; Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
 NFA_PR_2DCELL:
    .byte 7,"PR-CELL"
    .word NFA_INIT
@@ -313,11 +258,14 @@ _PR_2DCELL:
    call _FCALL
 ; ( A -- )
    .word _DUP           ; DUP
+; ( A A )
    .word _COUNTNEIGHBORS; COUNTNEIGHBORS
+; ( A N )
    .word _OVER          ; OVER
    .word _C_40          ; C@
    .word _LIVE          ; LIVE
    .word __3D           ; =
+; ( A N IsLive )
    .word __3FBRANCH,@B1 ; ?BRANCH @B1
 ; Клетка жива
    .word _DUP           ; DUP
@@ -366,6 +314,7 @@ NFA_LIFE:
    .word NFA_PR_2DCELL
 _LIFE:
    call _FCALL
+; ( -- )
    .word _INIT          ; INIT
 ; Первая ячейка поля - во второй строке, второй колонке
    .word _VIDMEM        ; VIDMEM

@@ -1,22 +1,6 @@
 \ Определение слов для последующей компиляции
 
-: CORNERS
-  41 76D0 !
-  42 771D !
-  43 7FA6 !
-  44 7FF3 !
-;
-
-: OPT-LOOP
-    HEIGHT 1- 1 DO
-      WIDTH 1- 1 DO
-        J WIDTH * I + 76D0 + .
-      LOOP
-      CR
-    LOOP
-;
-
-: FLD
+: FLD ( -- )
 \ Перебор всех ячеек экрана
 \    HEIGHT 0 DO
 \        WIDTH 0 DO
@@ -56,7 +40,7 @@
   C" D SWAP C!
 ;
 
-: INIT
+: INIT ( -- )
   \ Заполняем пробелами
   VIDMEM SIZE DEAD FILL
     
@@ -69,25 +53,27 @@
   DUP C 9 WIDTH * + VIDMEM + C! \ (12, 9)
   DUP B 8 WIDTH * + VIDMEM + C! \ (11, 8)
 
-  DUP 1A B WIDTH * + VIDMEM + C! \ (10, 10)
-  DUP 1B B WIDTH * + VIDMEM + C! \ (11, 10)
-  DUP 1C B WIDTH * + VIDMEM + C! \ (12, 10)
-  DUP 1A A WIDTH * + VIDMEM + C! \ (12, 9)
-  DUP 1B 9 WIDTH * + VIDMEM + C! \ (11, 8)
+  DUP 1A B WIDTH * + VIDMEM + C!
+  DUP 1B B WIDTH * + VIDMEM + C!
+  DUP 1C B WIDTH * + VIDMEM + C!
+  DUP 1A A WIDTH * + VIDMEM + C!
+  DUP 1B 9 WIDTH * + VIDMEM + C!
 
-  DUP A 1A WIDTH * + VIDMEM + C! \ (10, 10)
-  DUP B 1A WIDTH * + VIDMEM + C! \ (11, 10)
-  DUP C 1A WIDTH * + VIDMEM + C! \ (12, 10)
-  DUP C 19 WIDTH * + VIDMEM + C! \ (12, 9)
-  DUP B 18 WIDTH * + VIDMEM + C! \ (11, 8)
+  DUP A 1A WIDTH * + VIDMEM + C!
+  DUP B 1A WIDTH * + VIDMEM + C!
+  DUP C 1A WIDTH * + VIDMEM + C!
+  DUP C 19 WIDTH * + VIDMEM + C!
+  DUP B 18 WIDTH * + VIDMEM + C!
 
   DROP
 ;
 
+\ Анализ состояния ячейки
+\ Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
 : PR-CELL ( A -- )
-  DUP
-  COUNTNEIGHBORS
-  OVER C@ LIVE =
+  DUP            ( A A )
+  COUNTNEIGHBORS ( A N )
+  OVER C@ LIVE = ( A N IsLive )
     
   IF       \ Клетка жива
     DUP 2 = SWAP 3 = OR
@@ -97,7 +83,7 @@
   THEN
 ;
 
-: LIFE
+: LIFE ( -- )
   INIT
   \ Первая ячейка поля - во второй строке, второй колонке
   VIDMEM WIDTH + 1+
