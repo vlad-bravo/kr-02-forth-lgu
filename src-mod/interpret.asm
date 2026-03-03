@@ -1,6 +1,7 @@
 
 .include "memorymap.inc"
 .include "ext_names.inc"
+.include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
 
@@ -8,10 +9,10 @@
 
 .SECTION "interpret" FREE
 
-NFA_INTERPRET:
-   .byte 9,"INTERPRET"
-   .word NFA__3FSTACK
-_INTERPRET:
+.DEF PREV_NFA PREV_NFA_INTERPRET
+.DEF PREFIX PREFIX_INTERPRET
+
+NFA "INTERPRET"
    call _FCALL
    .word _LIT             ; LIT
    .word l6004            ; 
@@ -24,7 +25,7 @@ _INTERPRET:
 @3696:
    .word _BL              ; BL
    .word _WORD            ; WORD
-   .word _FIND            ; FIND
+   .word i_FIND           ; FIND
    .word _DUP             ; DUP
    .word __3FBRANCH       ; ?BRANCH
    .word @36BA            ; 
@@ -50,22 +51,19 @@ _INTERPRET:
    .word _1_2B            ; 1+
    .word __3FBRANCH       ; ?BRANCH
    .word @36CE            ; 
-   .word _DLITERAL        ; DLITERAL
+   .word i_DLITERAL       ; DLITERAL
    .word _BRANCH          ; BRANCH
    .word @36D2            ; 
 @36CE:
    .word _DROP            ; DROP
-   .word _LITERAL         ; LITERAL
+   .word i_LITERAL        ; LITERAL
 @36D2:
    .word __3FSTACK        ; ?STACK
    .word _BRANCH          ; BRANCH
    .word @3696            ; 
    .word _EXIT            ; EXIT
 
-NFA_QUIT:
-   .byte 4,"QUIT"
-   .word NFA__3C_3E
-i_QUIT:
+NFA "QUIT"
    call _FCALL
    .word _LIT             ; LIT
    .word l6000            ; 
@@ -84,15 +82,12 @@ i_QUIT:
    .word _FORTH           ; FORTH
    .word _DEFINITIONS     ; DEFINITIONS
 @2D2B:
-   .word _INTERPRET       ; INTERPRET
+   .word i_INTERPRET      ; INTERPRET
    .word _BRANCH          ; BRANCH
    .word @2D2B            ; 
    .word _EXIT            ; EXIT
 
-NFA_PROMPT:
-   .byte 6,"PROMPT"
-   .word NFA_CR
-_PROMPT:
+NFA "PROMPT"
    call _FCALL
 ; Буква режима работы
 ; STATE @ IF C" C ELSE C" I THEN EMIT
@@ -115,13 +110,10 @@ _PROMPT:
    .word _LIT, 0x3e       ; LIT ">"
    .word _EMIT, _SPACE, _EXIT
 
-NFA_QUERY:       ; 4561
-   .byte 5,"QUERY"
-   .word NFA_PROMPT
-i_QUERY:
+NFA "QUERY"
    call _FCALL            ; 4569
    .word _CR              ; #456c 454C - CR
-   .word _PROMPT
+   .word i_PROMPT
 ;   .word _LIT             ; #456e 28C7 - LIT
 ;   .word 0x003E           ; #4570 003E
 ;   .word _EMIT            ; #4572 3189 - EMIT
@@ -137,10 +129,7 @@ i_QUERY:
    .word _TRUE            ; #4586 2B49 - TRUE
    .word _EXIT            ; #4588 21A8 - EXIT
 
-NFA_S_2E:        ; 3C1A
-   .byte 2,"S."
-   .word NFA__2D_2D           ; 3C08
-_S_2E:           ; 3C1F - 3C58
+NFA2 "S.", "S_2E"
    call _FCALL            ; 3C1F
    .word _DEPTH           ; #3c22 3915 - DEPTH
    .word __3FDUP          ; #3c24 2284 - ?DUP
@@ -171,22 +160,16 @@ _S_2E:           ; 3C1F - 3C58
 @3C56:
    .word _EXIT            ; #3c56 21A8 - EXIT
 
-NFA_C_22:
-   .byte 0x82,"C\"" ; IMMEDIATE
-   .word NFA_DEPTH
-_C_22:
+NFA2 "C\"", "C_22", IMMEDIATE
    call _FCALL
    .word _BL              ; BL
    .word _WORD            ; WORD
    .word _1_2B            ; 1+
    .word _C_40            ; C@
-   .word _LITERAL         ; LITERAL
+   .word i_LITERAL         ; LITERAL
    .word _EXIT            ; EXIT
 
-NFA__2E_22:
-   .byte 0x82,".\"" ; IMMEDIATE
-   .word NFA_C_22
-__2E_22:
+NFA2 ".\"", "_2E_22", IMMEDIATE
    call _FCALL
    .word __3FCOMP         ; ?COMP
    .word _COMPILE         ; COMPILE
@@ -197,10 +180,7 @@ __2E_22:
    .word __22_2C          ; ",
    .word _EXIT            ; EXIT
 
-NFA__22:         ; 3956
-   .byte 0x81,"\"" ; IMMEDIATE
-   .word NFA__2E_22           ; 393E
-__22:            ; 395A - 3989
+NFA2 "\"", "_22", IMMEDIATE
    call _FCALL            ; 395A
    .word _STATE           ; #395d 20D5 - STATE
    .word __40             ; #395f 2820 - @
@@ -227,10 +207,7 @@ __22:            ; 395A - 3989
 @3987:
    .word _EXIT            ; #3987 21A8 - EXIT
 
-NFA__2E_28:      ; 3989
-   .byte 0x82,".(" ; IMMEDIATE
-   .word NFA__22            ; 3956
-__2E_28:         ; 398E - 399D
+NFA2 ".(", "_2E_28", IMMEDIATE
    call _FCALL            ; 398E
    .word _LIT             ; #3991 28C7 - LIT
    .word 0x0029           ; #3993 0029
@@ -239,148 +216,109 @@ __2E_28:         ; 398E - 399D
    .word _TYPE            ; #3999 31B4 - TYPE
    .word _EXIT            ; #399b 21A8 - EXIT
 
-NFA__3EMARK:     ; 399D
-   .byte 5,">MARK"
-   .word NFA__2E_28           ; 3989
-__3EMARK:        ; 39A5 - 39B0
+NFA2 ">MARK", "_3EMARK"
    call _FCALL            ; 39A5
    .word _HERE            ; #39a8 2B62 - HERE
    .word _0               ; #39aa 2B2B - 0
    .word __2C             ; #39ac 2B80 - ,
    .word _EXIT            ; #39ae 21A8 - EXIT
 
-NFA__3ERESOLVE:  ; 39B0
-   .byte 8,">RESOLVE"
-   .word NFA__3EMARK        ; 399D
-__3ERESOLVE:     ; 39BB - 39C6
+NFA2 ">RESOLVE", "_3ERESOLVE"
    call _FCALL            ; 39BB
    .word _HERE            ; #39be 2B62 - HERE
    .word _SWAP            ; #39c0 2238 - SWAP
    .word __21             ; #39c2 2839 - !
    .word _EXIT            ; #39c4 21A8 - EXIT
 
-NFA__3CMARK:     ; 39C6
-   .byte 5,"<MARK"
-   .word NFA__3ERESOLVE     ; 39B0
-__3CMARK:        ; 39CE - 39D5
+NFA2 "<MARK", "_3CMARK"
    call _FCALL            ; 39CE
    .word _HERE            ; #39d1 2B62 - HERE
    .word _EXIT            ; #39d3 21A8 - EXIT
 
-NFA__3CRESOLVE:  ; 39D5
-   .byte 8,"<RESOLVE"
-   .word NFA__3CMARK        ; 39C6
-__3CRESOLVE:     ; 39E0 - 39E7
+NFA2 "<RESOLVE", "_3CRESOLVE"
    call _FCALL            ; 39E0
    .word __2C             ; #39e3 2B80 - ,
    .word _EXIT            ; #39e5 21A8 - EXIT
 
-NFA_IF:          ; 39E7
-   .byte 0x82,"IF" ; IMMEDIATE
-   .word NFA__3CRESOLVE     ; 39D5
-_IF:             ; 39EC - 39FB
+NFA2 "IF", "IF", IMMEDIATE
    call _FCALL            ; 39EC
    .word __3FCOMP         ; #39ef 3862 - ?COMP
    .word _COMPILE         ; #39f1 2BE9 - COMPILE
    .word __3FBRANCH       ; #39f3 2916 - ?BRANCH
-   .word __3EMARK         ; #39f5 39A5 - >MARK
+   .word i__3EMARK        ; #39f5 39A5 - >MARK
    .word _2               ; #39f7 2B3D - 2
    .word _EXIT            ; #39f9 21A8 - EXIT
 
-NFA_IFNOT:       ; 39FB
-   .byte 0x85,"IFNOT" ; IMMEDIATE
-   .word NFA_IF           ; 39E7
-_IFNOT:          ; 3A03 - 3A12
+NFA2 "IFNOT", "IFNOT", IMMEDIATE
    call _FCALL            ; 3A03
    .word __3FCOMP         ; #3a06 3862 - ?COMP
    .word _COMPILE         ; #3a08 2BE9 - COMPILE
    .word _N_3FBRANCH      ; #3a0a 2934 - N?BRANCH
-   .word __3EMARK         ; #3a0c 39A5 - >MARK
+   .word i__3EMARK        ; #3a0c 39A5 - >MARK
    .word _2               ; #3a0e 2B3D - 2
    .word _EXIT            ; #3a10 21A8 - EXIT
 
-NFA_ELSE:        ; 3A12
-   .byte 0x84,"ELSE" ; IMMEDIATE
-   .word NFA_IFNOT        ; 39FB
-_ELSE:           ; 3A19 - 3A30
+NFA2 "ELSE", "ELSE", IMMEDIATE
    call _FCALL            ; 3A19
    .word __3FCOMP         ; #3a1c 3862 - ?COMP
    .word _2               ; #3a1e 2B3D - 2
    .word __3FPAIRS        ; #3a20 3893 - ?PAIRS
    .word _COMPILE         ; #3a22 2BE9 - COMPILE
    .word _BRANCH          ; #3a24 2904 - BRANCH
-   .word __3EMARK         ; #3a26 39A5 - >MARK
+   .word i__3EMARK        ; #3a26 39A5 - >MARK
    .word _SWAP            ; #3a28 2238 - SWAP
-   .word __3ERESOLVE      ; #3a2a 39BB - >RESOLVE
+   .word i__3ERESOLVE     ; #3a2a 39BB - >RESOLVE
    .word _2               ; #3a2c 2B3D - 2
    .word _EXIT            ; #3a2e 21A8 - EXIT
 
-NFA_THEN:        ; 3A30
-   .byte 0x84,"THEN" ; IMMEDIATE
-   .word NFA_ELSE         ; 3A12
-_THEN:           ; 3A37 - 3A44
+NFA2 "THEN", "THEN", IMMEDIATE
    call _FCALL            ; 3A37
    .word __3FCOMP         ; #3a3a 3862 - ?COMP
    .word _2               ; #3a3c 2B3D - 2
    .word __3FPAIRS        ; #3a3e 3893 - ?PAIRS
-   .word __3ERESOLVE      ; #3a40 39BB - >RESOLVE
+   .word i__3ERESOLVE     ; #3a40 39BB - >RESOLVE
    .word _EXIT            ; #3a42 21A8 - EXIT
 
-NFA_BEGIN:       ; 3A44
-   .byte 0x85,"BEGIN" ; IMMEDIATE
-   .word NFA_THEN         ; 3A30
-_BEGIN:          ; 3A4C - 3A57
+NFA2 "BEGIN", "BEGIN", IMMEDIATE
    call _FCALL            ; 3A4C
    .word __3FCOMP         ; #3a4f 3862 - ?COMP
-   .word __3CMARK         ; #3a51 39CE - <MARK
+   .word i__3CMARK        ; #3a51 39CE - <MARK
    .word _1               ; #3a53 2B34 - 1
    .word _EXIT            ; #3a55 21A8 - EXIT
 
-NFA_AGAIN:       ; 3A57
-   .byte 0x85,"AGAIN" ; IMMEDIATE
-   .word NFA_BEGIN        ; 3A44
-_AGAIN:          ; 3A5F - 3A70
+NFA2 "AGAIN", "AGAIN", IMMEDIATE
    call _FCALL            ; 3A5F
    .word __3FCOMP         ; #3a62 3862 - ?COMP
    .word _1               ; #3a64 2B34 - 1
    .word __3FPAIRS        ; #3a66 3893 - ?PAIRS
    .word _COMPILE         ; #3a68 2BE9 - COMPILE
    .word _BRANCH          ; #3a6a 2904 - BRANCH
-   .word __3CRESOLVE      ; #3a6c 39E0 - <RESOLVE
+   .word i__3CRESOLVE     ; #3a6c 39E0 - <RESOLVE
    .word _EXIT            ; #3a6e 21A8 - EXIT
 
-NFA_DO:          ; 3A70
-   .byte 0x82,"DO" ; IMMEDIATE
-   .word NFA_AGAIN        ; 3A57
-_DO:             ; 3A75 - 3A88
+NFA2 "DO", "DO", IMMEDIATE
    call _FCALL            ; 3A75
    .word __3FCOMP         ; #3a78 3862 - ?COMP
    .word _COMPILE         ; #3a7a 2BE9 - COMPILE
    .word __28DO_29        ; #3a7c 2991 - (DO)
-   .word __3EMARK         ; #3a7e 39A5 - >MARK
-   .word __3CMARK         ; #3a80 39CE - <MARK
+   .word i__3EMARK        ; #3a7e 39A5 - >MARK
+   .word i__3CMARK        ; #3a80 39CE - <MARK
    .word _LIT             ; #3a82 28C7 - LIT
    .word 0003             ; #3a84 0003
    .word _EXIT            ; #3a86 21A8 - EXIT
 
-NFA__3FDO:       ; 3A88
-   .byte 0x83,"?DO" ; IMMEDIATE
-   .word NFA_DO           ; 3A70
-__3FDO:          ; 3A8E - 3AA1
+NFA2 "?DO", "_3FDO", IMMEDIATE
    call _FCALL            ; 3A8E
    .word __3FCOMP         ; #3a91 3862 - ?COMP
    .word _COMPILE         ; #3a93 2BE9 - COMPILE
    .word __28_3FDO_29     ; #3a95 29B8 - (?DO)
-   .word __3EMARK         ; #3a97 39A5 - >MARK
-   .word __3CMARK         ; #3a99 39CE - <MARK
+   .word i__3EMARK        ; #3a97 39A5 - >MARK
+   .word i__3CMARK        ; #3a99 39CE - <MARK
    .word _LIT             ; #3a9b 28C7 - LIT
    .word 0003             ; #3a9d 0003
    .word _EXIT            ; #3a9f 21A8 - EXIT
 
-NFA_LOOP:        ; 3AA1
-   .byte 0x84,"LOOP" ; IMMEDIATE
-   .word NFA__3FDO          ; 3A88
-_LOOP:           ; 3AA8 - 3ABD
+NFA2 "LOOP", "LOOP", IMMEDIATE
    call _FCALL            ; 3AA8
    .word __3FCOMP         ; #3aab 3862 - ?COMP
    .word _LIT             ; #3aad 28C7 - LIT
@@ -388,14 +326,11 @@ _LOOP:           ; 3AA8 - 3ABD
    .word __3FPAIRS        ; #3ab1 3893 - ?PAIRS
    .word _COMPILE         ; #3ab3 2BE9 - COMPILE
    .word __28LOOP_29      ; #3ab5 29DA - (LOOP)
-   .word __3CRESOLVE      ; #3ab7 39E0 - <RESOLVE
-   .word __3ERESOLVE      ; #3ab9 39BB - >RESOLVE
+   .word i__3CRESOLVE     ; #3ab7 39E0 - <RESOLVE
+   .word i__3ERESOLVE     ; #3ab9 39BB - >RESOLVE
    .word _EXIT            ; #3abb 21A8 - EXIT
 
-NFA__2BLOOP:     ; 3ABD
-   .byte 0x85,"+LOOP" ; IMMEDIATE
-   .word NFA_LOOP         ; 3AA1
-__2BLOOP:        ; 3AC5 - 3ADA
+NFA2 "+LOOP", "_2BLOOP", IMMEDIATE
    call _FCALL            ; 3AC5
    .word __3FCOMP         ; #3ac8 3862 - ?COMP
    .word _LIT             ; #3aca 28C7 - LIT
@@ -403,55 +338,43 @@ __2BLOOP:        ; 3AC5 - 3ADA
    .word __3FPAIRS        ; #3ace 3893 - ?PAIRS
    .word _COMPILE         ; #3ad0 2BE9 - COMPILE
    .word __28_2BLOOP_29   ; #3ad2 2A0F - (+LOOP)
-   .word __3CRESOLVE      ; #3ad4 39E0 - <RESOLVE
-   .word __3ERESOLVE      ; #3ad6 39BB - >RESOLVE
+   .word i__3CRESOLVE     ; #3ad4 39E0 - <RESOLVE
+   .word i__3ERESOLVE     ; #3ad6 39BB - >RESOLVE
    .word _EXIT            ; #3ad8 21A8 - EXIT
 
-NFA_UNTIL:       ; 3ADA
-   .byte 0x85,"UNTIL" ; IMMEDIATE
-   .word NFA__2BLOOP        ; 3ABD
-_UNTIL:          ; 3AE2 - 3AF3
+NFA2 "UNTIL", "UNTIL", IMMEDIATE
    call _FCALL            ; 3AE2
    .word __3FCOMP         ; #3ae5 3862 - ?COMP
    .word _1               ; #3ae7 2B34 - 1
    .word __3FPAIRS        ; #3ae9 3893 - ?PAIRS
    .word _COMPILE         ; #3aeb 2BE9 - COMPILE
    .word __3FBRANCH       ; #3aed 2916 - ?BRANCH
-   .word __3CRESOLVE      ; #3aef 39E0 - <RESOLVE
+   .word i__3CRESOLVE     ; #3aef 39E0 - <RESOLVE
    .word _EXIT            ; #3af1 21A8 - EXIT
 
-NFA_WHILE:       ; 3AF3
-   .byte 0x85,"WHILE" ; IMMEDIATE
-   .word NFA_UNTIL        ; 3ADA
-_WHILE:          ; 3AFB - 3B0C
+NFA2 "WHILE", "WHILE", IMMEDIATE
    call _FCALL            ; 3AFB
    .word __3FCOMP         ; #3afe 3862 - ?COMP
    .word _1               ; #3b00 2B34 - 1
    .word __3FPAIRS        ; #3b02 3893 - ?PAIRS
    .word _1               ; #3b04 2B34 - 1
-   .word _IF              ; #3b06 39EC - IF
+   .word i_IF             ; #3b06 39EC - IF
    .word _2_2B            ; #3b08 2325 - 2+
    .word _EXIT            ; #3b0a 21A8 - EXIT
 
-NFA_REPEAT:      ; 3B0C
-   .byte 0x86,"REPEAT" ; IMMEDIATE
-   .word NFA_WHILE        ; 3AF3
-_REPEAT:         ; 3B15 - 3B2A
+NFA2 "REPEAT", "REPEAT", IMMEDIATE
    call _FCALL            ; 3B15
    .word __3FCOMP         ; #3b18 3862 - ?COMP
    .word __3ER            ; #3b1a 27A9 - >R
    .word __3ER            ; #3b1c 27A9 - >R
-   .word _AGAIN           ; #3b1e 3A5F - AGAIN
+   .word i_AGAIN          ; #3b1e 3A5F - AGAIN
    .word _R_3E            ; #3b20 27BC - R>
    .word _R_3E            ; #3b22 27BC - R>
    .word _2_2D            ; #3b24 233C - 2-
-   .word _THEN            ; #3b26 3A37 - THEN
+   .word i_THEN           ; #3b26 3A37 - THEN
    .word _EXIT            ; #3b28 21A8 - EXIT
 
-NFA_ABORT_22:    ; 2D86
-   .byte 0x86,"ABORT\"" ; IMMEDIATE
-   .word NFA__28ABORT_22_29     ; 2D56
-_ABORT_22:       ; 2D8F - 2DA2
+NFA2 "ABORT\"", "ABORT_22", IMMEDIATE
    call _FCALL            ; 2D8F
    .word __3FCOMP         ; #2d92 3862 - ?COMP
    .word _COMPILE         ; #2d94 2BE9 - COMPILE
@@ -462,10 +385,7 @@ _ABORT_22:       ; 2D8F - 2DA2
    .word __22_2C          ; #2d9e 2BA4 - ",
    .word _EXIT            ; #2da0 21A8 - EXIT
 
-NFA_:            ; 3172
-   .byte 0x80,"" ; IMMEDIATE
-   .word NFA_PTYPE        ; 314F
-_:               ; 3175 - 3182
+NFA2 "", "", IMMEDIATE
    call _FCALL            ; 3175
    .word _INLINE          ; #3178 3096 - INLINE
    .word _N_3FBRANCH      ; #317a 2934 - N?BRANCH
@@ -474,19 +394,13 @@ _:               ; 3175 - 3182
 @3180:
    .word _EXIT            ; #3180 21A8 - EXIT
 
-NFA__5B_27_5D:   ; 345E
-   .byte 0x83,"[']" ; IMMEDIATE
-   .word NFA__27            ; 3447
-__5B_27_5D:      ; 3464 - 346D
+NFA2 "[']", "_5B_27_5D", IMMEDIATE
    call _FCALL            ; 3464
-   .word __27             ; #3467 344B - '
-   .word _LITERAL         ; #3469 3477 - LITERAL
+   .word i__27            ; #3467 344B - '
+   .word i_LITERAL        ; #3469 3477 - LITERAL
    .word _EXIT            ; #346b 21A8 - EXIT
 
-NFA_LITERAL:     ; 346D
-   .byte 0x87,"LITERAL" ; IMMEDIATE
-   .word NFA__5B_27_5D          ; 345E
-_LITERAL:        ; 3477 - 348A
+NFA2 "LITERAL", "LITERAL", IMMEDIATE
    call _FCALL            ; 3477
    .word _STATE           ; #347a 20D5 - STATE
    .word __40             ; #347c 2820 - @
@@ -498,10 +412,7 @@ _LITERAL:        ; 3477 - 348A
 @3488:
    .word _EXIT            ; #3488 21A8 - EXIT
 
-NFA_DLITERAL:    ; 348A
-   .byte 0x88,"DLITERAL" ; IMMEDIATE
-   .word NFA_LITERAL      ; 346D
-_DLITERAL:       ; 3495 - 34AA
+NFA2 "DLITERAL", "DLITERAL", IMMEDIATE
    call _FCALL            ; 3495
    .word _STATE           ; #3498 20D5 - STATE
    .word __40             ; #349a 2820 - @
@@ -514,19 +425,13 @@ _DLITERAL:       ; 3495 - 34AA
 @34A8:
    .word _EXIT            ; #34a8 21A8 - EXIT
 
-NFA__5BCOMPILE_5D:; 34AA
-   .byte 0x89,"[COMPILE]" ; IMMEDIATE
-   .word NFA_DLITERAL     ; 348A
-__5BCOMPILE_5D:  ; 34B6 - 34BF
+NFA2 "[COMPILE]", "_5BCOMPILE_5D", IMMEDIATE
    call _FCALL            ; 34B6
-   .word __27             ; #34b9 344B - '
+   .word i__27            ; #34b9 344B - '
    .word __2C             ; #34bb 2B80 - ,
    .word _EXIT            ; #34bd 21A8 - EXIT
 
-NFA__28:         ; 3C58
-   .byte 0x81,"(" ; IMMEDIATE
-   .word NFA_S_2E           ; 3C1A
-__28:            ; 3C5C - 3C69
+NFA2 "(", "_28", IMMEDIATE
    call _FCALL            ; 3C5C
    .word _LIT             ; #3c5f 28C7 - LIT
    .word 0x0029           ; #3c61 0029
@@ -534,31 +439,25 @@ __28:            ; 3C5C - 3C69
    .word _DROP            ; #3c65 222D - DROP
    .word _EXIT            ; #3c67 21A8 - EXIT
 
-NFA_SCRATCH:     ; 3C88
-   .byte 0x87,"SCRATCH" ; IMMEDIATE
-   .word NFA__3FCURRENT     ; 3C69
-_SCRATCH:        ; 3C92 - 3CAC
+NFA2 "SCRATCH", "SCRATCH", IMMEDIATE
    call _FCALL            ; 3C92
    .word __3FEXEC         ; #3c95 3834 - ?EXEC
    .word _BL              ; #3c97 3289 - BL
    .word _WORD            ; #3c99 302A - WORD
    .word _CURRENT         ; #3c9b 20F3 - CURRENT
    .word __40             ; #3c9d 2820 - @
-   .word __2DWORD         ; #3c9f 33FB - -WORD
+   .word i__2DWORD        ; #3c9f 33FB - -WORD
    .word _0_3D            ; #3ca1 2421 - 0=
    .word __28ABORT_22_29  ; #3ca3 2D61 - (ABORT")
    .byte 4," - ?"
    .word _EXIT            ; #3caa 21A8 - EXIT
 
-NFA_JOIN:        ; 3CAC
-   .byte 0x84,"JOIN" ; IMMEDIATE
-   .word NFA_SCRATCH      ; 3C88
-_JOIN:           ; 3CB3 - 3CCA
+NFA2 "JOIN", "JOIN", IMMEDIATE
    call _FCALL            ; 3CB3
    .word __3FEXEC         ; #3cb6 3834 - ?EXEC
    .word _BL              ; #3cb8 3289 - BL
    .word _WORD            ; #3cba 302A - WORD
-   .word __3FCURRENT      ; #3cbc 3C74 - ?CURRENT
+   .word i__3FCURRENT     ; #3cbc 3C74 - ?CURRENT
    .word _N_3ELINK        ; #3cbe 3008 - N>LINK
    .word __40             ; #3cc0 2820 - @
    .word _LATEST          ; #3cc2 3303 - LATEST
@@ -566,16 +465,13 @@ _JOIN:           ; 3CB3 - 3CCA
    .word __21             ; #3cc6 2839 - !
    .word _EXIT            ; #3cc8 21A8 - EXIT
 
-NFA_NEW:         ; 3CCA
-   .byte 0x83,"NEW" ; IMMEDIATE
-   .word NFA_JOIN         ; 3CAC
-_NEW:            ; 3CD0 - 3D07
+NFA2 "NEW", "NEW", IMMEDIATE
    call _FCALL            ; 3CD0
    .word __3FEXEC         ; #3cd3 3834 - ?EXEC
    .word _BL              ; #3cd5 3289 - BL
    .word _WORD            ; #3cd7 302A - WORD
    .word _DUP             ; #3cd9 2277 - DUP
-   .word __3FCURRENT      ; #3cdb 3C74 - ?CURRENT
+   .word i__3FCURRENT     ; #3cdb 3C74 - ?CURRENT
    .word _CURRENT         ; #3cdd 20F3 - CURRENT
    .word __40             ; #3cdf 2820 - @
    .word __3ER            ; #3ce1 27A9 - >R
@@ -585,7 +481,7 @@ _NEW:            ; 3CD0 - 3D07
    .word __21             ; #3ce9 2839 - !
    .word _NAME_3E         ; #3ceb 2FD6 - NAME>
    .word _SWAP            ; #3ced 2238 - SWAP
-   .word __3FCURRENT      ; #3cef 3C74 - ?CURRENT
+   .word i__3FCURRENT     ; #3cef 3C74 - ?CURRENT
    .word _NAME_3E         ; #3cf1 2FD6 - NAME>
    .word _LIT             ; #3cf3 28C7 - LIT
    .word 0x00C3           ; #3cf5 00C3
@@ -598,14 +494,11 @@ _NEW:            ; 3CD0 - 3D07
    .word __21             ; #3d03 2839 - !
    .word _EXIT            ; #3d05 21A8 - EXIT
 
-NFA_FORGET:      ; 3D07
-   .byte 6,"FORGET"
-   .word NFA_NEW          ; 3CCA
-_FORGET:         ; 3D10 - 3D80
+NFA "FORGET"
    call _FCALL            ; 3D10
    .word _BL              ; #3d13 3289 - BL
    .word _WORD            ; #3d15 302A - WORD
-   .word __3FCURRENT      ; #3d17 3C74 - ?CURRENT
+   .word i__3FCURRENT     ; #3d17 3C74 - ?CURRENT
    .word _DUP             ; #3d19 2277 - DUP
    .word _FENCE           ; #3d1b 20AE - FENCE
    .word __40             ; #3d1d 2820 - @
@@ -656,29 +549,20 @@ _FORGET:         ; 3D10 - 3D80
    .word __21             ; #3d7c 2839 - !
    .word _EXIT            ; #3d7e 21A8 - EXIT
 
-NFA__5B:         ; 3350
-   .byte 0x81,"[" ; IMMEDIATE
-   .word NFA_SMUDGE       ; 333A
-i__5B:
+NFA2 "[", "_5B", IMMEDIATE
    call _FCALL            ; 3354
    .word _STATE           ; #3357 20D5 - STATE
    .word _0_21            ; #3359 2898 - 0!
    .word _EXIT            ; #335b 21A8 - EXIT
 
-NFA__5D:         ; 335D
-   .byte 1,"]"
-   .word NFA__5B            ; 3350
-__5D:            ; 3361 - 336C
+NFA2 "]", "_5D"
    call _FCALL            ; 3361
    .word __2D1            ; #3364 2B22 - -1
    .word _STATE           ; #3366 20D5 - STATE
    .word __21             ; #3368 2839 - !
    .word _EXIT            ; #336a 21A8 - EXIT
 
-NFA__3A:         ; 38C0
-   .byte 0x81,":" ; IMMEDIATE
-   .word NFA_LEAVE        ; 38AD
-__3A:            ; 38C4 - 38DF
+NFA2 ":", "_3A", IMMEDIATE
    call _FCALL            ; 38C4
    .word __3FEXEC         ; #38c7 3834 - ?EXEC
    .word __21CSP          ; #38c9 37F9 - !CSP
@@ -688,28 +572,22 @@ __3A:            ; 38C4 - 38DF
    .word __21             ; #38d1 2839 - !
    .word _CREATE          ; #38d3 36E3 - CREATE
    .word _SMUDGE          ; #38d5 3343 - SMUDGE
-   .word __5D             ; #38d7 3361 - ]
+   .word i__5D            ; #38d7 3361 - ]
    .word _CALL            ; #38d9 2201 - CALL
    .word __28_21CODE_29   ; #38db 332F - (!CODE)
    .word _EXIT            ; #38dd 21A8 - EXIT
 
-NFA__3B:         ; 38DF
-   .byte 0x81,";" ; IMMEDIATE
-   .word NFA__3A            ; 38C0
-__3B:            ; 38E3 - 38F4
+NFA2 ";", "_3B", IMMEDIATE
    call _FCALL            ; 38E3
    .word __3FCOMP         ; #38e6 3862 - ?COMP
    .word __3FCSP          ; #38e8 380B - ?CSP
    .word _COMPILE         ; #38ea 2BE9 - COMPILE
    .word _EXIT            ; #38ec 21A8 - EXIT
    .word _SMUDGE          ; #38ee 3343 - SMUDGE
-   .word __5B             ; #38f0 3354 - [
+   .word i__5B            ; #38f0 3354 - [
    .word _EXIT            ; #38f2 21A8 - EXIT
 
-NFA_IMMEDIATE:   ; 38F4
-   .byte 9,"IMMEDIATE"
-   .word NFA__3B            ; 38DF
-_IMMEDIATE:      ; 3900 - 390D
+NFA "IMMEDIATE"
    call _FCALL            ; 3900
    .word _LATEST          ; #3903 3303 - LATEST
    .word _LIT             ; #3905 28C7 - LIT
@@ -717,20 +595,14 @@ _IMMEDIATE:      ; 3900 - 390D
    .word _TOGGLE          ; #3909 2982 - TOGGLE
    .word _EXIT            ; #390b 21A8 - EXIT
 
-NFA__21CSP:      ; 37F2
-   .byte 4,"!CSP"
-   .word NFA_STRING       ; 37DC
-i__21CSP:
+NFA2 "!CSP", "_21CSP"
    call _FCALL            ; 37F9
    .word _SP_40           ; #37fc 22D6 - SP@
    .word _CSP             ; #37fe 2114 - CSP
    .word __21             ; #3800 2839 - !
    .word _EXIT            ; #3802 21A8 - EXIT
 
-NFA__3FCSP:      ; 3804
-   .byte 4,"?CSP"
-   .word NFA__21CSP         ; 37F2
-i__3FCSP:
+NFA2 "?CSP", "_3FCSP"
    call _FCALL            ; 380B
    .word _SP_40           ; #380e 22D6 - SP@
    .word _CSP             ; #3810 2114 - CSP
@@ -741,10 +613,7 @@ i__3FCSP:
    .stringmap russian,"CБOЙ CTEKA ПO CSP"
    .word _EXIT            ; #382a 21A8 - EXIT
 
-NFA__3FEXEC:     ; 382C
-   .byte 5,"?EXEC"
-   .word NFA__3FCSP         ; 3804
-i__3FEXEC:
+NFA2 "?EXEC", "_3FEXEC"
    call _FCALL            ; 3834
    .word _STATE           ; #3837 20D5 - STATE
    .word __40             ; #3839 2820 - @
@@ -753,10 +622,7 @@ i__3FEXEC:
    .stringmap russian," TPEБУET PEЖИMA BЫПOЛHEHИЯ"
    .word _EXIT            ; #3858 21A8 - EXIT
 
-NFA__3FCOMP:     ; 385A
-   .byte 5,"?COMP"
-   .word NFA__3FEXEC        ; 382C
-i__3FCOMP:
+NFA2 "?COMP", "_3FCOMP"
    call _FCALL            ; 3862
    .word _STATE           ; #3865 20D5 - STATE
    .word __40             ; #3867 2820 - @
@@ -766,10 +632,7 @@ i__3FCOMP:
    .stringmap russian," TPEБУET PEЖИMA KOMПИЛЯЦИИ"
    .word _EXIT            ; #3888 21A8 - EXIT
 
-NFA__3FPAIRS:    ; 388A
-   .byte 6,"?PAIRS"
-   .word NFA__3FCOMP        ; 385A
-i__3FPAIRS:
+NFA2 "?PAIRS", "_3FPAIRS"
    call _FCALL            ; 3893
    .word _XOR             ; #3896 2787 - XOR
    .word __28ABORT_22_29  ; #3898 2D61 - (ABORT")
@@ -777,10 +640,7 @@ i__3FPAIRS:
    .stringmap russian," HEПAPHAЯ CKOБKA"
    .word _EXIT            ; #38ab 21A8 - EXIT
 
-NFA__3FCURRENT:  ; 3C69
-   .byte 8,"?CURRENT"
-   .word NFA__28            ; 3C58
-__3FCURRENT:     ; 3C74 - 3C88
+NFA2 "?CURRENT", "_3FCURRENT"
    call _FCALL            ; 3C74
    .word _CURRENT         ; #3c77 20F3 - CURRENT
    .word __40             ; #3c79 2820 - @
@@ -790,10 +650,7 @@ __3FCURRENT:     ; 3C74 - 3C88
    .byte 4," - ?"
    .word _EXIT            ; #3c86 21A8 - EXIT
 
-NFA_FIND:        ; 336C
-   .byte 4,"FIND"
-   .word NFA__5D            ; 335D
-_FIND:           ; 3373 - 33D6
+NFA "FIND"
    call _FCALL            ; 3373
    .word _LIT             ; #3376 28C7 - LIT
    .word l6006            ; #3378 6006
@@ -852,10 +709,7 @@ _FIND:           ; 3373 - 33D6
 @33D4:
    .word _EXIT            ; #33d4 21A8 - EXIT
 
-NFA__2BWORD:     ; 33D6
-   .byte 5,"+WORD"
-   .word NFA_FIND         ; 336C
-__2BWORD:        ; 33DE - 33F3
+NFA2 "+WORD", "_2BWORD"
    call _FCALL            ; 33DE
    .word _HERE            ; #33e1 2B62 - HERE
    .word _ROT             ; #33e3 225A - ROT
@@ -867,10 +721,7 @@ __2BWORD:        ; 33DE - 33F3
    .word __21             ; #33ef 2839 - !
    .word _EXIT            ; #33f1 21A8 - EXIT
 
-NFA__2DWORD:     ; 33F3
-   .byte 5,"-WORD"
-   .word NFA__2BWORD        ; 33D6
-__2DWORD:        ; 33FB - 341A
+NFA2 "-WORD", "_2DWORD"
    call _FCALL            ; 33FB
    .word __3FWORD         ; #33fe 26DB - ?WORD
    .word __3FBRANCH       ; #3400 2916 - ?BRANCH
@@ -889,28 +740,22 @@ __2DWORD:        ; 33FB - 341A
 @3418:
    .word _EXIT            ; #3418 21A8 - EXIT
 
-NFA__27:         ; 3447
-   .byte 1,"'"
-   .word NFA_ERASE        ; 3436
-__27:            ; 344B - 345E
+NFA2 "'", "_27"
    call _FCALL            ; 344B
    .word _BL              ; #344e 3289 - BL
    .word _WORD            ; #3450 302A - WORD
-   .word _FIND            ; #3452 3373 - FIND
+   .word i_FIND           ; #3452 3373 - FIND
    .word _0_3D            ; #3454 2421 - 0=
    .word __28ABORT_22_29  ; #3456 2D61 - (ABORT")
    .byte 3,"-? "
    .word _EXIT            ; #345c 21A8 - EXIT
 
-NFA_CREATE:      ; 36DA
-   .byte 6,"CREATE"
-   .word NFA_INTERPRET    ; 3677
-i_CREATE:
+NFA "CREATE"
    call _FCALL            ; 36E3
    .word _BL              ; #36e6 3289 - BL
    .word _WORD            ; #36e8 302A - WORD
    .word _DUP             ; #36ea 2277 - DUP
-   .word _FIND            ; #36ec 3373 - FIND
+   .word i_FIND           ; #36ec 3373 - FIND
    .word _PRESS           ; #36ee 22B4 - PRESS
    .word __3FBRANCH       ; #36f0 2916 - ?BRANCH
    .word @370C            ; #36f2 370C
@@ -923,32 +768,23 @@ i_CREATE:
 @370C:
    .word _CURRENT         ; #370c 20F3 - CURRENT
    .word __40             ; #370e 2820 - @
-   .word __2BWORD         ; #3710 33DE - +WORD
+   .word i__2BWORD        ; #3710 33DE - +WORD
    .word _CFL             ; #3712 2F44 - CFL
    .word _ALLOT           ; #3714 2B73 - ALLOT
    .word _EXIT            ; #3716 21A8 - EXIT
 
-NFA__3CBUILDS:   ; 3718
-   .byte 7,"<BUILDS"
-   .word NFA_CREATE       ; 36DA
-__3CBUILDS:      ; 3722 - 3729
+NFA2 "<BUILDS", "_3CBUILDS"
    call _FCALL            ; 3722
    .word _CREATE          ; #3725 36E3 - CREATE
    .word _EXIT            ; #3727 21A8 - EXIT
 
-NFA__28DOES_3E_29:; 3729
-   .byte 7,"(DOES>)"
-   .word NFA__3CBUILDS      ; 3718
-i__28DOES_3E_29:  ; 3733 - 373C
+NFA2 "(DOES>)", "_28DOES_3E_29"
    call _FCALL            ; 3733
    .word _R_3E            ; #3736 27BC - R>
    .word __28_21CODE_29   ; #3738 332F - (!CODE)
    .word _EXIT            ; #373a 21A8 - EXIT
 
-NFA_DOES_3E:     ; 373C
-   .byte 0x85,"DOES>" ; IMMEDIATE
-   .word NFA__28DOES_3E_29      ; 3729
-_DOES_3E:        ; 3744 - 3757
+NFA2 "DOES>", "DOES_3E", IMMEDIATE
    call _FCALL            ; 3744
    .word _COMPILE         ; #3747 2BE9 - COMPILE
    .word __28DOES_3E_29   ; #3749 3733 - (DOES>)
@@ -959,10 +795,7 @@ _DOES_3E:        ; 3744 - 3757
    .word _ALLOT           ; #3753 2B73 - ALLOT
    .word _EXIT            ; #3755 21A8 - EXIT
 
-NFA_CONSTANT:    ; 3757
-   .byte 8,"CONSTANT"
-   .word NFA_DOES_3E        ; 373C
-_CONSTANT:       ; 3762 - 3771
+NFA "CONSTANT"
    call _FCALL            ; 3762
    .word _CREATE          ; #3765 36E3 - CREATE
    .word __2C             ; #3767 2B80 - ,
@@ -971,10 +804,7 @@ _CONSTANT:       ; 3762 - 3771
    .word __28_21CODE_29   ; #376d 332F - (!CODE)
    .word _EXIT            ; #376f 21A8 - EXIT
 
-NFA_VARIABLE:    ; 3771
-   .byte 8,"VARIABLE"
-   .word NFA_CONSTANT     ; 3757
-_VARIABLE:       ; 377C - 378B
+NFA "VARIABLE"
    call _FCALL            ; 377C
    .word _CREATE          ; #377f 36E3 - CREATE
    .word _0               ; #3781 2B2B - 0
@@ -983,10 +813,7 @@ _VARIABLE:       ; 377C - 378B
    .word __28_21CODE_29   ; #3787 332F - (!CODE)
    .word _EXIT            ; #3789 21A8 - EXIT
 
-NFA_VOCABULARY:  ; 378B
-   .byte 10,"VOCABULARY"
-   .word NFA_VARIABLE     ; 3771
-_VOCABULARY:     ; 3798 - 37DC
+NFA "VOCABULARY"
    call _FCALL            ; 3798
    .word _LIT             ; #379b 28C7 - LIT
    .word l6008            ; #379d 6008
@@ -1023,10 +850,7 @@ VOCABULARY_DOES:
    .word __21             ; #37d8 2839 - !
    .word _EXIT            ; #37da 21A8 - EXIT
 
-NFA_STRING:      ; 37DC
-   .byte 6,"STRING"
-   .word NFA_VOCABULARY   ; 378B
-_STRING:         ; 37E5 - 37F2
+NFA "STRING"
    call _FCALL            ; 37E5
    .word _CREATE          ; #37e8 36E3 - CREATE
    .word __22_2C          ; #37ea 2BA4 - ",

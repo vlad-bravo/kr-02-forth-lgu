@@ -1,25 +1,23 @@
 
 .include "memorymap.inc"
 .include "ext_names.inc"
+.include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
 
 .SECTION "math" FREE
 
-NFA__2B:         ; 22E9
-   .byte 1,"+"
-   .word NFA_SP_21          ; 22DE
-m__2B:            ; 22ED - 22F4
+.DEF PREV_NFA PREV_NFA_MATH
+.DEF PREFIX PREFIX_MATH
+
+NFA2 "+", "_2B"
    pop h           ; #22ed e1
    pop d           ; #22ee d1
    dad d           ; #22ef 19
    push h          ; #22f0 e5
    jmp _FNEXT      ; #22f1 c3 9a 21
 
-NFA__2D:         ; 22F4
-   .byte 1,"-"
-   .word NFA__2B            ; 22E9
-m__2D:            ; 22F8 - 2304
+NFA2 "-", "_2D"
    pop h           ; #22f8 e1
    pop d           ; #22f9 d1
    mov a,e         ; #22fa 7b
@@ -31,66 +29,45 @@ m__2D:            ; 22F8 - 2304
    push h          ; #2300 e5
    jmp _FNEXT      ; #2301 c3 9a 21
 
-NFA_NEGATE:      ; 2304
-   .byte 6,"NEGATE"
-   .word NFA__2D            ; 22F4
-m_NEGATE:         ; 230D - 2315
+NFA "NEGATE"
    pop h
    call l242f      ; #230e cd 2f 24
    push h          ; #2311 e5
    jmp _FNEXT      ; #2312 c3 9a 21
 
-NFA_1_2B:        ; 2315
-   .byte 2,"1+"
-   .word NFA_NEGATE       ; 2304
-m_1_2B:           ; 231A - 2320
+NFA2 "1+", "1_2B"
    pop h           ; #231a e1
    inx h           ; #231b 23
    push h          ; #231c e5
    jmp _FNEXT      ; #231d c3 9a 21
 
-NFA_2_2B:        ; 2320
-   .byte 2,"2+"
-   .word NFA_1_2B           ; 2315
-m_2_2B:           ; 2325 - 232C
+NFA2 "2+", "2_2B"
    pop h           ; #2325 e1
    inx h           ; #2326 23
    inx h           ; #2327 23
    push h          ; #2328 e5
    jmp _FNEXT      ; #2329 c3 9a 21
 
-NFA_1_2D:        ; 232C
-   .byte 2,"1-"
-   .word NFA_2_2B           ; 2320
-m_1_2D:           ; 2331 - 2337
+NFA2 "1-", "1_2D"
    pop h           ; #2331 e1
    dcx h           ; #2332 2b
    push h          ; #2333 e5
    jmp _FNEXT      ; #2334 c3 9a 21
 
-NFA_2_2D:        ; 2337
-   .byte 2,"2-"
-   .word NFA_1_2D           ; 232C
-m_2_2D:           ; 233C - 2343
+NFA2 "2-", "2_2D"
    pop h           ; #233c e1
    dcx h           ; #233d 2b
    dcx h           ; #233e 2b
    push h          ; #233f e5
    jmp _FNEXT      ; #2340 c3 9a 21
 
-NFA_2_2A:        ; 2343
-   .byte 2,"2*"
-   .word NFA_2_2D           ; 2337
-m_2_2A:           ; 2348 - 234E
+NFA2 "2*", "2_2A"
    pop h           ; #2348 e1
    dad h           ; #2349 29
    push h          ; #234a e5
    jmp _FNEXT      ; #234b c3 9a 21
 
-NFA_ABS:         ; 234E
-   .byte 3,"ABS"
-   .word NFA_2_2A           ; 2343
-m_ABS:            ; 2354 - 235E
+NFA "ABS"
    pop h           ; #2354 e1
    mov a,h         ; #2355 7c
    ora a           ; #2356 b7
@@ -98,10 +75,7 @@ m_ABS:            ; 2354 - 235E
    push h          ; #235a e5
    jmp _FNEXT      ; #235b c3 9a 21
 
-NFA_MIN:         ; 235E
-   .byte 3,"MIN"
-   .word NFA_ABS          ; 234E
-m_MIN:            ; 2364 - 237B
+NFA "MIN"
    pop d           ; #2364 d1
    pop h           ; #2365 e1
    push d          ; #2366 d5
@@ -120,10 +94,7 @@ m_MIN:            ; 2364 - 237B
    xthl            ; #2377 e3
    jmp _FNEXT      ; #2378 c3 9a 21
 
-NFA_MAX:         ; 237B
-   .byte 3,"MAX"
-   .word NFA_MIN          ; 235E
-m_MAX:            ; 2381 - 2398
+NFA "MAX"
    pop h           ; #2381 e1
    pop d           ; #2382 d1
    push d          ; #2383 d5
@@ -142,10 +113,7 @@ m_MAX:            ; 2381 - 2398
    xthl            ; #2394 e3
    jmp _FNEXT      ; #2395 c3 9a 21
 
-NFA_U_3C:        ; 2398
-   .byte 2,"U<"
-   .word NFA_MAX          ; 237B
-m_U_3C:           ; 239D - 23AE
+NFA2 "U<", "U_3C"
    pop d           ; #239d d1
    pop h           ; #239e e1
    mov a,l         ; #239f 7d
@@ -159,10 +127,7 @@ m_U_3C:           ; 239D - 23AE
    push h          ; #23aa e5
    jmp _FNEXT      ; #23ab c3 9a 21
 
-NFA__3C:         ; 23AE
-   .byte 1,"<"
-   .word NFA_U_3C           ; 2398
-m__3C:            ; 23B2 - 23D2
+NFA2 "<", "_3C"
    pop h           ; #23b2 e1
    pop d           ; #23b3 d1
 l23b4:
@@ -186,18 +151,12 @@ l23b4:
    push h          ; #23ce e5
    jmp _FNEXT      ; #23cf c3 9a 21
 
-NFA__3E:         ; 23D2
-   .byte 1,">"
-   .word NFA__3C            ; 23AE
-m__3E:            ; 23D6 - 23DB
+NFA2 ">", "_3E"
    pop d           ; #23d6 d1
    pop h           ; #23d7 e1
    jmp l23b4       ; #23d8 c3 b4 23
 
-NFA_0_3C:        ; 23DB
-   .byte 2,"0<"
-   .word NFA__3E            ; 23D2
-m_0_3C:           ; 23E0 - 23EE
+NFA2 "0<", "0_3C"
    pop h
    mov a,h         ; #23e1 7c
    lxi h,0000      ; #23e2 21 00 00
@@ -208,10 +167,7 @@ m_0_3C:           ; 23E0 - 23EE
    push h          ; #23ea e5
    jmp _FNEXT      ; #23eb c3 9a 21
 
-NFA_0_3E:        ; 23EE
-   .byte 2,"0>"
-   .word NFA_0_3C           ; 23DB
-m_0_3E:           ; 23F3 - 2405
+NFA2 "0>", "0_3E"
    pop d           ; #23f3 d1
    lxi h,0000      ; #23f4 21 00 00
    mov a,d         ; #23f7 7a
@@ -224,10 +180,7 @@ m_0_3E:           ; 23F3 - 2405
    push h          ; #2401 e5
    jmp _FNEXT      ; #2402 c3 9a 21
 
-NFA__3D:         ; 2405
-   .byte 1,"="
-   .word NFA_0_3E           ; 23EE
-m__3D:            ; 2409 - 241C
+NFA2 "=", "_3D"
    pop h           ; #2409 e1
    pop d           ; #240a d1
    mov a,l         ; #240b 7d
@@ -243,10 +196,7 @@ m__3D:            ; 2409 - 241C
    push h          ; #2418 e5
    jmp _FNEXT      ; #2419 c3 9a 21
 
-NFA_0_3D:        ; 241C
-   .byte 2,"0="
-   .word NFA__3D            ; 2405
-m_0_3D:           ; 2421 - 2437
+NFA2 "0=", "0_3D"
    pop h           ; #2421 e1
    mov a,h         ; #2422 7c
    lxi d,0000      ; #2423 11 00 00
@@ -266,10 +216,7 @@ l242f:
    inx h           ; #2435 23
    ret             ; #2436 c9
 
-NFA_2_2F:        ; 245B
-   .byte 2,"2/"
-   .word NFA__2DTRAILING    ; 2437
-m_2_2F:           ; 2460 - 246D
+NFA2 "2/", "2_2F"
    pop h           ; #2460 e1
    mov a,h         ; #2461 7c
    add a           ; #2462 87
@@ -282,10 +229,7 @@ m_2_2F:           ; 2460 - 246D
    push h          ; #2469 e5
    jmp _FNEXT      ; #246a c3 9a 21
 
-NFA_D_2B:        ; 246D
-   .byte 2,"D+"
-   .word NFA_2_2F           ; 245B
-m_D_2B:           ; 2472 - 2482
+NFA2 "D+", "D_2B"
    pop d           ; #2472 d1
    pop h           ; #2473 e1
    xthl            ; #2474 e3
@@ -300,10 +244,7 @@ m_D_2B:           ; 2472 - 2482
    push h          ; #247e e5
    jmp _FNEXT      ; #247f c3 9a 21
 
-NFA_D_3C:        ; 2482
-   .byte 2,"D<"
-   .word NFA_D_2B           ; 246D
-m_D_3C:           ; 2487 - 24B9
+NFA2 "D<", "D_3C"
    pop d           ; #2487 d1
    pop h           ; #2488 e1
    xthl            ; #2489 e3
@@ -343,10 +284,7 @@ m_D_3C:           ; 2487 - 24B9
    push d          ; #24b5 d5
    jmp _FNEXT      ; #24b6 c3 9a 21
 
-NFA_DNEGATE:     ; 24B9
-   .byte 7,"DNEGATE"
-   .word NFA_D_3C           ; 2482
-m_DNEGATE:        ; 24C3 - 24D8
+NFA "DNEGATE"
    pop h           ; #24c3 e1
    xthl            ; #24c4 e3
    mvi d,00        ; #24c5 16 00
@@ -366,10 +304,7 @@ m_DNEGATE:        ; 24C3 - 24D8
    push h          ; #24d4 e5
    jmp _FNEXT      ; #24d5 c3 9a 21
 
-NFA__2A:         ; 2538
-   .byte 1,"*"
-   .word NFA_ROLL         ; 250D
-m__2A:            ; 253C - 2562
+NFA2 "*", "_2A"
    mov h,b         ; #253c 60
    mov l,c         ; #253d 69
    pop b           ; #253e c1
@@ -397,10 +332,7 @@ m__2A:            ; 253C - 2562
    jnz @2555       ; #255e c2 55 25
    ret             ; #2561 c9
 
-NFA_UM_2A:       ; 2562
-   .byte 3,"UM*"
-   .word NFA__2A            ; 2538
-m_UM_2A:          ; 2568 - 2591
+NFA2 "UM*", "UM_2A"
    pop h           ; #2568 e1
    pop d           ; #2569 d1
    push b          ; #256a c5
@@ -434,10 +366,7 @@ m_UM_2A:          ; 2568 - 2591
    jnc @2579       ; #258d d2 79 25
    ret             ; #2590 c9
 
-NFA_DU_2FMOD:    ; 2591
-   .byte 6,"DU/MOD"
-   .word NFA_UM_2A          ; 2562
-m_DU_2FMOD:       ; 259A - 2677
+NFA2 "DU/MOD", "DU_2FMOD"
    lxi h,l6145     ; #259a 21 45 61
    mvi a,04        ; #259d 3e 04
 @259f:
@@ -599,10 +528,7 @@ l2649:
    pop d           ; #2673 d1
    jmp @265f       ; #2674 c3 5f 26
 
-NFA__2FMOD:      ; 2677
-   .byte 4,"/MOD"
-   .word NFA_DU_2FMOD       ; 2591
-m__2FMOD:         ; 267E - 26BF
+NFA2 "/MOD", "_2FMOD"
    pop h           ; #267e e1
    pop d           ; #267f d1
    push b          ; #2680 c5
@@ -651,10 +577,7 @@ m__2FMOD:         ; 267E - 26BF
    push d          ; #26bb d5
    jmp _FNEXT      ; #26bc c3 9a 21
 
-NFA_U_2FMOD:     ; 26BF
-   .byte 5,"U/MOD"
-   .word NFA__2FMOD         ; 2677
-m_U_2FMOD:        ; 26C7 - 26D3
+NFA2 "U/MOD", "U_2FMOD"
    pop h           ; #26c7 e1
    pop d           ; #26c8 d1
    push b          ; #26c9 c5
@@ -664,10 +587,7 @@ m_U_2FMOD:        ; 26C7 - 26D3
    push h          ; #26cf e5
    jmp _FNEXT      ; #26d0 c3 9a 21
 
-NFA_AND:         ; 275E
-   .byte 3,"AND"
-   .word NFA_DIGIT        ; 2727
-m_AND:            ; 2764 - 2770
+NFA "AND"
    pop h           ; #2764 e1
    pop d           ; #2765 d1
    mov a,e         ; #2766 7b
@@ -679,10 +599,7 @@ m_AND:            ; 2764 - 2770
    push h          ; #276c e5
    jmp _FNEXT      ; #276d c3 9a 21
 
-NFA_OR:          ; 2770
-   .byte 2,"OR"
-   .word NFA_AND          ; 275E
-m_OR:             ; 2775 - 2781
+NFA "OR"
    pop h           ; #2775 e1
    pop d           ; #2776 d1
    mov a,e         ; #2777 7b
@@ -694,10 +611,7 @@ m_OR:             ; 2775 - 2781
    push h          ; #277d e5
    jmp _FNEXT      ; #277e c3 9a 21
 
-NFA_XOR:         ; 2781
-   .byte 3,"XOR"
-   .word NFA_OR           ; 2770
-m_XOR:            ; 2787 - 2793
+NFA "XOR"
    pop h           ; #2787 e1
    pop d           ; #2788 d1
    mov a,e         ; #2789 7b
@@ -709,10 +623,7 @@ m_XOR:            ; 2787 - 2793
    push h          ; #278f e5
    jmp _FNEXT      ; #2790 c3 9a 21
 
-NFA_NOT:         ; 2793
-   .byte 3,"NOT"
-   .word NFA_XOR          ; 2781
-m_NOT:            ; 2799 - 27A4
+NFA "NOT"
    pop h           ; #2799 e1
    mov a,h         ; #279a 7c
    cma             ; #279b 2f

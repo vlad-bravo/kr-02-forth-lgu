@@ -9,11 +9,15 @@ LFA_OUT = "NFA_EXIT"
 HEADER = """
 .include "memorymap.inc"
 .include "ext_names.inc"
+.include "nfa.inc"
 .include "..\\src\\ramdefs.inc"
 .include "..\\src\\monitor.inc"
 .include "life.inc"
 
 .SECTION "compiled" FREE
+
+.DEF PREV_NFA PREV_NFA_COMPILED
+.DEF PREFIX PREFIX_COMPILED
 
 """
 
@@ -175,16 +179,11 @@ class Context:
         return result
 
     def create_nfa(self, name):
-        int_name = filtr_string(name)
-        new_nfa = f'NFA{int_name}'
-        result = (
-            f"{new_nfa}:\n"
-            f"   .byte {len(name)},\"{name}\"\n"
-            f"   .word {self.prev_nfa}\n"
-            f"{int_name}:\n"
-            f"   call _FCALL"
-        )
-        self.prev_nfa = new_nfa
+        int_name = filtr_string(name)[1:]
+        if int_name == name:
+            result = f"NFA \"{name}\"\n   call _FCALL"
+        else:
+            result = f"NFA2 \"{name}\", \"{int_name}\"\n   call _FCALL"
         self.label_count = 0
         return result
 

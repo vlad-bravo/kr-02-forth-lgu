@@ -1,17 +1,18 @@
 
 .include "memorymap.inc"
 .include "ext_names.inc"
+.include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
 .include "life.inc"
 
 .SECTION "compiled" FREE
 
+.DEF PREV_NFA PREV_NFA_COMPILED
+.DEF PREFIX PREFIX_COMPILED
+
 ; Определение слов для последующей компиляции
-NFA_FLD:
-   .byte 3,"FLD"
-   .word NFA_EXIT
-_FLD:
+NFA "FLD"
    call _FCALL
 ; ( -- )
 ; Перебор всех ячеек экрана
@@ -92,10 +93,7 @@ _FLD:
    .word _C_21          ; C!
    .word _EXIT          ; EXIT
 
-NFA_INIT:
-   .byte 4,"INIT"
-   .word NFA_FLD
-_INIT:
+NFA "INIT"
    call _FCALL
 ; ( -- )
 ; Заполняем пробелами
@@ -251,10 +249,7 @@ _INIT:
 
 ; Анализ состояния ячейки
 ; Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
-NFA_PR_2DCELL:
-   .byte 7,"PR-CELL"
-   .word NFA_INIT
-_PR_2DCELL:
+NFA2 "PR-CELL", "PR_2DCELL"
    call _FCALL
 ; ( A -- )
    .word _DUP           ; DUP
@@ -309,10 +304,7 @@ _PR_2DCELL:
 @B4:
    .word _EXIT          ; EXIT
 
-NFA_LIFE:
-   .byte 4,"LIFE"
-   .word NFA_PR_2DCELL
-_LIFE:
+NFA "LIFE"
    call _FCALL
 ; ( -- )
    .word _INIT          ; INIT
@@ -377,10 +369,7 @@ _LIFE:
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 
-NFA_HH:
-   .byte 2,"HH"
-   .word NFA_LIFE
-_HH:
+NFA "HH"
    call _FCALL
    .word __28_22_29     ; (")
    .byte 12,"HELLO, HABR!"
@@ -388,10 +377,7 @@ _HH:
    .word _TYPE          ; TYPE
    .word _EXIT          ; EXIT
 
-NFA_PROMPT2:
-   .byte 7,"PROMPT2"
-   .word NFA_HH
-_PROMPT2:
+NFA "PROMPT2"
    call _FCALL
 ; ( -- )
 ; Режим трансляции
@@ -420,10 +406,7 @@ _PROMPT2:
    .word _EXIT          ; EXIT
 
 ; Всегда последнее слово (для правильной цепочки NFA)
-NFA_BYE:
-   .byte 3,"BYE"
-   .word NFA_PROMPT2
-_BYE:
+NFA "BYE"
    call _FCALL
    .word _LIT,0xF800    ; F800
    .word _EXECUTE       ; EXECUTE

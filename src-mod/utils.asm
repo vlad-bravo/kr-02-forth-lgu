@@ -1,6 +1,7 @@
 
 .include "memorymap.inc"
 .include "ext_names.inc"
+.include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
 
@@ -8,10 +9,10 @@
 
 .SECTION "utils" FREE
 
-NFA_DUMP:        ; 3B2A
-   .byte 4,"DUMP"
-   .word NFA_REPEAT       ; 3B0C
-_DUMP:           ; 3B31 - 3BA4
+.DEF PREV_NFA PREV_NFA_UTILS
+.DEF PREFIX PREFIX_UTILS
+
+NFA "DUMP"
    call _FCALL            ; 3B31
    .word _BASE            ; #3b34 20C8 - BASE
    .word __40             ; #3b36 2820 - @
@@ -76,10 +77,7 @@ _DUMP:           ; 3B31 - 3BA4
    .word __21             ; #3ba0 2839 - !
    .word _EXIT            ; #3ba2 21A8 - EXIT
 
-NFA_NLIST:       ; 3BA4
-   .byte 5,"NLIST"
-   .word NFA_DUMP         ; 3B2A
-_NLIST:          ; 3BAC - 3BF5
+NFA "NLIST"
    call _FCALL            ; 3BAC
 @3BAF:
    .word __40             ; #3baf 2820 - @
@@ -120,17 +118,11 @@ _NLIST:          ; 3BAC - 3BF5
    .word _DROP            ; #3bf1 222D - DROP
    .word _EXIT            ; #3bf3 21A8 - EXIT
 
-NFA_VLIST:       ; 3BF5
-   .byte 5,"VLIST"
-   .word NFA_NLIST        ; 3BA4
-_VLIST:          ; 3BFD - 3C08
+NFA "VLIST"
    call _FCALL            ; 3BFD
    .word _CONTEXT, __40, _NLIST, _EXIT
 
-NFA__2D_2D:      ; 3C08
-   .byte 0x82,"--" ; IMMEDIATE
-   .word NFA_VLIST        ; 3BF5
-__2D_2D:         ; 3C0D - 3C1A
+NFA2 "--", "_2D_2D", IMMEDIATE
    call _FCALL            ; 3C0D
    .word __23TIB          ; #3c10 2148 - #TIB
    .word __40             ; #3c12 2820 - @
@@ -138,10 +130,7 @@ __2D_2D:         ; 3C0D - 3C1A
    .word __21             ; #3c16 2839 - !
    .word _EXIT            ; #3c18 21A8 - EXIT
 
-NFA_DISFORT:     ; 3E04
-   .byte 7,"DISFORT"
-   .word NFA_STR          ; 3DE5
-_DISFORT:        ; 3E0E - 3F7E
+NFA "DISFORT"
    call _FCALL            ; 3E0E
    .word _CR              ; #3e11 454C - CR
    .word __3ER            ; #3e13 27A9 - >R
@@ -297,10 +286,7 @@ _DISFORT:        ; 3E0E - 3F7E
 @3F7C:
    .word _EXIT            ; #3f7c 21A8 - EXIT
 
-NFA__3FNAME:     ; 3D80
-   .byte 5,"?NAME"
-   .word NFA_FORGET       ; 3D07
-__3FNAME:        ; 3D88 - 3DE5
+NFA2 "?NAME", "_3FNAME"
    call _FCALL            ; 3D88
    .word _F_2DCODE        ; #3d8b 323B - F-CODE
    .word _OVER            ; #3d8d 220D - OVER

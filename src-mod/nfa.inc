@@ -1,18 +1,18 @@
 
-.DEF IMMEDIATE 0x80
+.def IMMEDIATE 0x80
 
 ; Для простых слов
-.MACRO NFA ARGS name
+.macro NFA ARGS name
 NFA_{name}:
    .byte name.length, name
    .word PREV_NFA
 {PREFIX}_{name}:
-.REDEF PREV_NFA NFA_{name}
-.ENDM
+.redef PREV_NFA NFA_{name}
+.endm
 
 ; Для слов с отличающимся int_name
 ; Так же для слов IMMEDIATE
-.MACRO NFA2 ARGS name, int_name
+.macro NFA2 ARGS name, int_name
 NFA_{int_name}:
 .if NARGS <= 2
    .byte name.length, name
@@ -21,5 +21,33 @@ NFA_{int_name}:
 .endif
    .word PREV_NFA
 {PREFIX}_{int_name}:
-.REDEF PREV_NFA NFA_{int_name}
-.ENDM
+.redef PREV_NFA NFA_{int_name}
+.endm
+
+;.def PREV_NFA_FORTH NFA_FORTH
+.def PREFIX_FORTH ""
+.def LAST_NFA_FORTH NFA_STANDIO
+
+.DEF PREV_NFA_VAR LAST_NFA_FORTH
+.DEF PREFIX_VAR "v"
+.def LAST_NFA_VAR NFA_B_2DSP
+
+.DEF PREV_NFA_MATH LAST_NFA_VAR
+.DEF PREFIX_MATH "m"
+.def LAST_NFA_MATH NFA_NOT
+
+.DEF PREV_NFA_INTERPRET LAST_NFA_MATH
+.DEF PREFIX_INTERPRET "i"
+.def LAST_NFA_INTERPRET NFA_VOCABULARY
+
+.DEF PREV_NFA_UTILS LAST_NFA_INTERPRET
+.DEF PREFIX_UTILS ""
+.def LAST_NFA_UTILS NFA__3FNAME
+
+.def PREV_NFA_COMPILED LAST_NFA_UTILS
+.def PREFIX_COMPILED ""
+.def LAST_NFA_COMPILED NFA_BYE
+
+.DEF PREV_NFA_LIFE_MANUAL LAST_NFA_COMPILED
+.DEF PREFIX_LIFE_MANUAL "l"
+.def LAST_NFA_LIFE_MANUAL NFA_PDEAD
