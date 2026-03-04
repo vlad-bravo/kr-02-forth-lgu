@@ -151,6 +151,120 @@
   0 D.
 ;
 
+: >BODY
+  CFL +
+;
+
+: BODY>
+  CFL -
+;
+
+: >NAME
+  2- 1- TRAVERSE
+;
+
+: NAME>
+  1 TRAVERSE 2+
+;
+
+: >LINK
+  2-
+;
+
+: LINK>
+  2+
+;
+
+: N>LINK
+  1 TRAVERSE
+;
+
+: L>NAME
+  -1 TRAVERSE
+;
+
+: >PRT
+  7F MAX BL MAX
+;
+
+: PTYPE
+  0 DO
+    DUP C@ >PRT EMIT 1+
+  LOOP
+  DROP
+;
+
+: EMIT
+  l600e @ EXECUTE >OUT 1+!
+;
+
+: KEY
+  l600c @ EXECUTE
+;
+
+: HEX
+  10 BASE !
+;
+
+: DECIMAL
+  A BASE !
+;
+
+: BLANK
+  BL FILL
+;
+
+: SPACE
+  BL EMIT
+;
+
+: SPACES
+  0 DO SPACE LOOP
+;
+
+: ID.
+  COUNT 3F AND TYPE
+;
+
+: DEFINITIONS
+  CONTEXT @ CURRENT !
+;
+
+: LATEST
+  CURRENT @ @
+;
+
+: ;S
+  RDROP
+;
+
+: >CH
+  >IN @ DUP #TIB @ U<
+  IFNOT
+    DROP FALSE
+  ELSE
+    TIB + C@ >IN 1+! TRUE
+  THEN
+;
+
+: TYPE
+  l6012 @ ?DUP IF EXECUTE EXIT THEN
+  0 DO DUP C@ EMIT 1+ LOOP
+  DROP
+;
+
+: TITLE
+  CR ." ФOPT-7970 BEPCИЯ 6.2 OT 19.06.85  " ." (CTAHДAPT FORTH-83)"
+  CR ."     B.A.KИPИЛЛИH A.A.KЛУБOBИЧ H.P.HOЗДPУHOB"
+  CR 14 SPACES ." BЦ  ЛГУ"
+  CR ." 198904 ЛEHИHГPAД ПETPOДBOPEЦ БИБЛИOTEЧHAЯ ПЛ. Д. 2"
+  CR l600a @ ?DUP IF EXECUTE THEN
+;
+
+: FORTH-83
+  CR ." CTAHДAPT FORTH-83"
+;
+
 : STANDIO
   l6014 @ ?DUP IF EXECUTE EXIT THEN
   [COMPILE] QUERY INLINP !

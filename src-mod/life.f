@@ -108,7 +108,7 @@
   AGAIN
 ;
 
-: HH ." HELLO, HABR!" COUNT TYPE ;
+: HH " HELLO, HABR!" COUNT TYPE ;
 
 : PROMPT2 ( -- )
   \ Режим трансляции

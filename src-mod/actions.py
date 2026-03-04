@@ -8,8 +8,11 @@ def action_colon(context, word):
 def action_semicolon(context, word):
     return '-', 'EXIT'
 
-def action_dotquot(context, word):
+def action_quot(context, word):
     return '(")', context.splitter.следующий('"')
+
+def action_dotquot(context, word):
+    return '(.")', context.splitter.следующий('"')
 
 def action_abortquot(context, word):
     return '(ABORT")', context.splitter.следующий('"')

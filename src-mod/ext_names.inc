@@ -3,16 +3,6 @@
 .include "interpret_defs.inc"
 .include "math_defs.inc"
 
-; From interpret.asm
-.def _CREATE i_CREATE
-.def __3FEXEC i__3FEXEC
-.def __21CSP i__21CSP
-.def __3FCOMP i__3FCOMP
-.def __28DOES_3E_29 i__28DOES_3E_29
-.def __5B i__5B
-.def __3FCSP i__3FCSP
-.def __3FPAIRS i__3FPAIRS
-
 ; From var.asm
 .def _R0 v_R0
 .def _S0 v_S0

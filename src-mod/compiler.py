@@ -106,7 +106,17 @@ class Context:
         elif type == '-':
             result = self.write_word(text) + '\n'
         elif type == '(")':
-            result = self.write_word(type) + f"\n   .byte {len(text)},\"{text}\""
+            result = (
+                f"{self.write_word(type)}\n"
+                f"   .byte {len(text)}\n"
+                f"   .stringmap russian,\"{text}\""
+            )
+        elif type == '(.")':
+            result = (
+                f"{self.write_word(type)}\n"
+                f"   .byte {len(text)}\n"
+                f"   .stringmap russian,\"{text}\""
+            )
         elif type == '(ABORT")':
             result = (
                 f"{self.write_word(type)}\n"
@@ -179,8 +189,14 @@ class Context:
         return result
 
     def create_nfa(self, name):
+        is_immediate = name in (
+            'LITERAL', 'DLITERAL', 'DOES>', ';', ':', '[', 'NEW', 'JOIN', '(', 'SCRATCH',
+            '[COMPILE]', '[\']', 'ABORT"', 'C"', '."', '"', '.(', 'IF', 'IFNOT',
+            'ELSE', 'THEN', 'BEGIN', 'AGAIN', 'DO', '?DO', 'LOOP', '+LOOP',
+            'UNTIL', 'WHILE', 'REPEAT',
+        )
         int_name = filtr_string(name)[1:]
-        if int_name == name:
+        if int_name == name and not is_immediate:
             result = f"NFA \"{name}\"\n   call _FCALL"
         else:
             mask_name = ''
@@ -189,7 +205,8 @@ class Context:
                     mask_name += '\\"'
                 else:
                     mask_name += char
-            result = f"NFA2 \"{mask_name}\", \"{int_name}\"\n   call _FCALL"
+            imm_suffix = ', IMMEDIATE' if is_immediate else ''
+            result = f"NFA2 \"{mask_name}\", \"{int_name}\"{imm_suffix}\n   call _FCALL"
         self.label_count = 0
         if self.is_prefix:
             self.prefix_defs.append(f".def _{int_name} {self.prefix}_{int_name}\n")

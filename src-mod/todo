@@ -1,0 +1,37 @@
+
+
+: WHILE ?COMP 1 ?PAIRS 1 IF 2+ ;
+
+: REPEAT ?COMP >R >R AGAIN R> R> 2- THEN ;
+
+: FORGET
+  BL WORD ?CURRENT DUP FENCE @ U<
+  ABORT" BЫXOД ЗA FENCE"
+  >R VOC-LINK @
+  BEGIN
+    R@ OVER U<
+  WHILE
+  FORTH DEFINITIONS @ DUP VOC-LINK !
+  BEGIN
+    DUP 4 -
+    BEGIN
+      N>LINK @ DUP R@ U<
+    UNTIL
+    OVER 2- ! @ ?DUP 0=
+  UNTIL
+  R> H !
+;
+
+: FORGET2 ( ---> )     >NAME ( NFA)
+  DUP  FENCE  @  U<  ABORT" ЗAЩИTA ПO FENCE"
+  >R  VOC-LINK  !  ( NO:ВХОД В СПИСОК СПИСКОВ)
+BEGIN R@ OVER U< WHILE ( N:ЗВЕНО СВЯЗИ СПИСКА)
+     FORTH  DEFINITIONS
+     @  DUP  VOC-LINK ! ( N1:ЗВЕНО СЛЕДУЩЕГО)
+  REPEAT  ( N1:ЗВЕНО ОСТАВШЕГОСЯ СПИСКА)
+BEGIN  DUP  4  - ( N:ЗВЕНО СВЯЗИ,L:ВХОД В СЛОВА)
+     BEGIN  N>LINK  @  ( N,NFA:ОЧЕРЕДНОЕ СЛОВО)
+  DUP  R@  U<  UNTIL  ( N,NFA:ОСТАЮЩЕЕСЯ СЛОВО)
+OVER 2- ( N,NFA1,L:АДРЕС СВЯЗИ ФИКТИВНОЙ СТАТЬИ)
+     !  @  ?DUP  0=
+UNTIL  R>  ( NFA0)  HERE  -  ALLOT ;

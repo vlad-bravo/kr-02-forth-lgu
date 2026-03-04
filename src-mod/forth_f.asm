@@ -400,6 +400,240 @@ NFA2 "U.", "U_2E"
    .word _D_2E          ; D.
    .word _EXIT          ; EXIT
 
+NFA2 ">BODY", "_3EBODY"
+   call _FCALL
+   .word _CFL           ; CFL
+   .word __2B           ; +
+   .word _EXIT          ; EXIT
+
+NFA2 "BODY>", "BODY_3E"
+   call _FCALL
+   .word _CFL           ; CFL
+   .word __2D           ; -
+   .word _EXIT          ; EXIT
+
+NFA2 ">NAME", "_3ENAME"
+   call _FCALL
+   .word _2_2D          ; 2-
+   .word _1_2D          ; 1-
+   .word _TRAVERSE      ; TRAVERSE
+   .word _EXIT          ; EXIT
+
+NFA2 "NAME>", "NAME_3E"
+   call _FCALL
+   .word _1             ; 1
+   .word _TRAVERSE      ; TRAVERSE
+   .word _2_2B          ; 2+
+   .word _EXIT          ; EXIT
+
+NFA2 ">LINK", "_3ELINK"
+   call _FCALL
+   .word _2_2D          ; 2-
+   .word _EXIT          ; EXIT
+
+NFA2 "LINK>", "LINK_3E"
+   call _FCALL
+   .word _2_2B          ; 2+
+   .word _EXIT          ; EXIT
+
+NFA2 "N>LINK", "N_3ELINK"
+   call _FCALL
+   .word _1             ; 1
+   .word _TRAVERSE      ; TRAVERSE
+   .word _EXIT          ; EXIT
+
+NFA2 "L>NAME", "L_3ENAME"
+   call _FCALL
+   .word __2D1          ; -1
+   .word _TRAVERSE      ; TRAVERSE
+   .word _EXIT          ; EXIT
+
+NFA2 ">PRT", "_3EPRT"
+   call _FCALL
+   .word _LIT,0x7F      ; 7F
+   .word _MAX           ; MAX
+   .word _BL            ; BL
+   .word _MAX           ; MAX
+   .word _EXIT          ; EXIT
+
+NFA "PTYPE"
+   call _FCALL
+   .word _0             ; 0
+   .word __28_3FDO_29,@B2 ; (?DO) @B2
+@B1:
+   .word _DUP           ; DUP
+   .word _C_40          ; C@
+   .word __3EPRT        ; >PRT
+   .word _EMIT          ; EMIT
+   .word _1_2B          ; 1+
+   .word __28LOOP_29,@B1 ; (LOOP) @B1
+@B2:
+   .word _DROP          ; DROP
+   .word _EXIT          ; EXIT
+
+NFA "EMIT"
+   call _FCALL
+   .word _LIT,l600e     ; l600e
+   .word __40           ; @
+   .word _EXECUTE       ; EXECUTE
+   .word __3EOUT        ; >OUT
+   .word _1_2B_21       ; 1+!
+   .word _EXIT          ; EXIT
+
+NFA "KEY"
+   call _FCALL
+   .word _LIT,l600c     ; l600c
+   .word __40           ; @
+   .word _EXECUTE       ; EXECUTE
+   .word _EXIT          ; EXIT
+
+NFA "HEX"
+   call _FCALL
+   .word _LIT,0x10      ; 10
+   .word _BASE          ; BASE
+   .word __21           ; !
+   .word _EXIT          ; EXIT
+
+NFA "DECIMAL"
+   call _FCALL
+   .word _LIT,0xA       ; A
+   .word _BASE          ; BASE
+   .word __21           ; !
+   .word _EXIT          ; EXIT
+
+NFA "BLANK"
+   call _FCALL
+   .word _BL            ; BL
+   .word _FILL          ; FILL
+   .word _EXIT          ; EXIT
+
+NFA "SPACE"
+   call _FCALL
+   .word _BL            ; BL
+   .word _EMIT          ; EMIT
+   .word _EXIT          ; EXIT
+
+NFA "SPACES"
+   call _FCALL
+   .word _0             ; 0
+   .word __28_3FDO_29,@B2 ; (?DO) @B2
+@B1:
+   .word _SPACE         ; SPACE
+   .word __28LOOP_29,@B1 ; (LOOP) @B1
+@B2:
+   .word _EXIT          ; EXIT
+
+NFA2 "ID.", "ID_2E"
+   call _FCALL
+   .word _COUNT         ; COUNT
+   .word _LIT,0x3F      ; 3F
+   .word _AND           ; AND
+   .word _TYPE          ; TYPE
+   .word _EXIT          ; EXIT
+
+NFA "DEFINITIONS"
+   call _FCALL
+   .word _CONTEXT       ; CONTEXT
+   .word __40           ; @
+   .word _CURRENT       ; CURRENT
+   .word __21           ; !
+   .word _EXIT          ; EXIT
+
+NFA "LATEST"
+   call _FCALL
+   .word _CURRENT       ; CURRENT
+   .word __40           ; @
+   .word __40           ; @
+   .word _EXIT          ; EXIT
+
+NFA2 ";S", "_3BS"
+   call _FCALL
+   .word _RDROP         ; RDROP
+   .word _EXIT          ; EXIT
+
+NFA2 ">CH", "_3ECH"
+   call _FCALL
+   .word __3EIN         ; >IN
+   .word __40           ; @
+   .word _DUP           ; DUP
+   .word __23TIB        ; #TIB
+   .word __40           ; @
+   .word _U_3C          ; U<
+   .word _N_3FBRANCH,@B1 ; N?BRANCH @B1
+   .word _DROP          ; DROP
+   .word _FALSE         ; FALSE
+   .word _BRANCH,@B2    ; BRANCH @B2
+@B1:
+   .word _TIB           ; TIB
+   .word __2B           ; +
+   .word _C_40          ; C@
+   .word __3EIN         ; >IN
+   .word _1_2B_21       ; 1+!
+   .word _TRUE          ; TRUE
+@B2:
+   .word _EXIT          ; EXIT
+
+NFA "TYPE"
+   call _FCALL
+   .word _LIT,l6012     ; l6012
+   .word __40           ; @
+   .word __3FDUP        ; ?DUP
+   .word __3FBRANCH,@B1 ; ?BRANCH @B1
+   .word _EXECUTE       ; EXECUTE
+   .word _EXIT          ; EXIT
+@B1:
+   .word _0             ; 0
+   .word __28_3FDO_29,@B3 ; (?DO) @B3
+@B2:
+   .word _DUP           ; DUP
+   .word _C_40          ; C@
+   .word _EMIT          ; EMIT
+   .word _1_2B          ; 1+
+   .word __28LOOP_29,@B2 ; (LOOP) @B2
+@B3:
+   .word _DROP          ; DROP
+   .word _EXIT          ; EXIT
+
+NFA "TITLE"
+   call _FCALL
+   .word _CR            ; CR
+   .word __28_2E_22_29  ; (.")
+   .byte 34
+   .stringmap russian,"ФOPT-7970 BEPCИЯ 6.2 OT 19.06.85  "
+   .word __28_2E_22_29  ; (.")
+   .byte 19
+   .stringmap russian,"(CTAHДAPT FORTH-83)"
+   .word _CR            ; CR
+   .word __28_2E_22_29  ; (.")
+   .byte 43
+   .stringmap russian,"    B.A.KИPИЛЛИH A.A.KЛУБOBИЧ H.P.HOЗДPУHOB"
+   .word _CR            ; CR
+   .word _LIT,0x14      ; 14
+   .word _SPACES        ; SPACES
+   .word __28_2E_22_29  ; (.")
+   .byte 7
+   .stringmap russian,"BЦ  ЛГУ"
+   .word _CR            ; CR
+   .word __28_2E_22_29  ; (.")
+   .byte 50
+   .stringmap russian,"198904 ЛEHИHГPAД ПETPOДBOPEЦ БИБЛИOTEЧHAЯ ПЛ. Д. 2"
+   .word _CR            ; CR
+   .word _LIT,l600a     ; l600a
+   .word __40           ; @
+   .word __3FDUP        ; ?DUP
+   .word __3FBRANCH,@B1 ; ?BRANCH @B1
+   .word _EXECUTE       ; EXECUTE
+@B1:
+   .word _EXIT          ; EXIT
+
+NFA2 "FORTH-83", "FORTH_2D83"
+   call _FCALL
+   .word _CR            ; CR
+   .word __28_2E_22_29  ; (.")
+   .byte 17
+   .stringmap russian,"CTAHДAPT FORTH-83"
+   .word _EXIT          ; EXIT
+
 NFA "STANDIO"
    call _FCALL
    .word _LIT,l6014     ; l6014

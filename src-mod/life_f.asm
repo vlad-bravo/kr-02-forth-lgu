@@ -372,7 +372,8 @@ NFA "LIFE"
 NFA "HH"
    call _FCALL
    .word __28_22_29     ; (")
-   .byte 12,"HELLO, HABR!"
+   .byte 12
+   .stringmap russian,"HELLO, HABR!"
    .word _COUNT         ; COUNT
    .word _TYPE          ; TYPE
    .word _EXIT          ; EXIT

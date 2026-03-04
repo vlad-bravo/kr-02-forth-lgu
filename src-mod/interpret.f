@@ -36,11 +36,11 @@
 
 : LITERAL
   STATE @ IF COMPILE LIT , THEN
-; IMMEDIATE
+;
 
 : DLITERAL
   STATE @ IF COMPILE DLIT , , THEN
-; IMMEDIATE
+;
 
 : IMMEDIATE
   LATEST 80 TOGGLE
@@ -71,4 +71,202 @@
   CR
   PROMPT \ C" > EMIT
   TIB 4F EXPECT CR TIB SPAN @ 0 TRUE
+;
+
+: VARIABLE
+  CREATE 0 , NEXT (!CODE)
+;
+
+: CONSTANT
+  CREATE , [COMPILE] @ (!CODE)
+;
+
+: DOES>
+  COMPILE (DOES>) CALL HERE !CF CFL ALLOT
+;
+
+: (DOES>)
+  R> (!CODE)
+;
+
+: <BUILDS
+  CREATE
+;
+
+: CREATE
+  BL WORD DUP FIND PRESS
+  IF
+    DUP ID. ."  УЖE OПPEДEЛEH " CR
+  THEN
+  CURRENT @ +WORD CFL ALLOT
+;
+
+: '
+  BL WORD FIND 0= ABORT" -? "
+;
+
+: -WORD
+  ?WORD
+  IF
+    N>LINK @ W-LINK @ ! TRUE
+  ELSE
+    DROP FALSE
+  THEN
+;
+
+: +WORD
+  HERE ROT ", SWAP DUP @ , !
+;
+
+: ?CURRENT
+  CURRENT @ ?WORD 0= ABORT"  -? "
+;
+
+: ?PAIRS
+  XOR ABORT"  HEПAPHAЯ CKOБKA"
+;
+
+: ?COMP
+  STATE @ 0= ABORT"  TPEБУET PEЖИMA KOMПИЛЯЦИИ"
+;
+
+: ?EXEC
+  STATE @ ABORT"  TPEБУET PEЖИMA BЫПOЛHEHИЯ"
+;
+
+: !CSP
+  SP@ CSP !
+;
+
+: ?CSP
+  SP@ CSP @ XOR ABORT" CБOЙ CTEKA ПO CSP"
+;
+
+: :
+  ?EXEC !CSP CURRENT @ CONTEXT ! CREATE SMUDGE ] CALL (!CODE)
+;
+
+: ;
+  ?COMP ?CSP COMPILE EXIT SMUDGE [
+;
+
+: [
+  STATE 0!
+;
+
+: ]
+  -1 STATE !
+;
+
+: NEW
+  ?EXEC BL WORD DUP ?CURRENT CURRENT @ >R DUP N>LINK CURRENT ! NAME> SWAP ?CURRENT NAME> CD OVER C! 1+ ! R> CURRENT !
+;
+
+: JOIN
+  ?EXEC BL WORD ?CURRENT N>LINK @ LATEST N>LINK !
+;
+
+: SCRATCH
+  ?EXEC BL WORD CURRENT @ -WORD 0= ABORT"  - ?"
+;
+
+: (
+  C" ) WORD DROP
+;
+
+: [COMPILE]
+  ' ,
+;
+
+: [']
+  ' LITERAL
+;
+
+: ABORT"
+  ?COMP COMPILE (ABORT") C" " WORD ",
+;
+
+: C"
+  BL WORD 1+ C@ LITERAL
+;
+
+: ."
+  ?COMP COMPILE (.") C" " WORD ",
+;
+
+: "
+  STATE @
+  IF
+    COMPILE (") C" " WORD ",
+  ELSE
+    C" " WORD PAD OVER C@ 1+ CMOVE PAD
+  THEN
+;
+
+: .(
+  C" ) WORD COUNT TYPE
+;
+
+: >MARK
+  HERE 0 ,
+;
+
+: >RESOLVE
+  HERE SWAP !
+;
+
+: <MARK
+  HERE
+;
+
+: <RESOLVE
+  ,
+;
+
+: IF
+  ?COMP COMPILE ?BRANCH >MARK 2
+;
+
+: IFNOT
+  ?COMP COMPILE N?BRANCH >MARK 2
+;
+
+: ELSE
+  ?COMP 2 ?PAIRS COMPILE BRANCH >MARK SWAP >RESOLVE 2
+;
+
+: THEN
+  ?COMP 2 ?PAIRS >RESOLVE
+;
+
+: BEGIN
+  ?COMP <MARK 1
+;
+
+: AGAIN
+  ?COMP 1 ?PAIRS COMPILE BRANCH <RESOLVE
+;
+
+: DO
+  ?COMP COMPILE (DO) >MARK <MARK 3
+;
+
+: ?DO
+  ?COMP COMPILE (?DO) >MARK <MARK 3
+;
+
+: LOOP
+  ?COMP 3 ?PAIRS COMPILE (LOOP) <RESOLVE >RESOLVE
+;
+
+: +LOOP
+  ?COMP 3 ?PAIRS COMPILE (+LOOP) <RESOLVE >RESOLVE
+;
+
+: UNTIL
+  ?COMP 1 ?PAIRS COMPILE ?BRANCH <RESOLVE
+;
+
+: STRING
+  CREATE ", NEXT (!CODE)
 ;

@@ -101,7 +101,7 @@ N_FORTH:       ; 2068
    call VOCABULARY_DOES ; #2070 cd d1 37
    .byte 0x01        ; #2073
    .byte 0x80        ; #2074 nfa (fake)
-   .word NFA_STANDIO ; #2075 lfa
+   .word LATEST_NFA  ; #2075 lfa
    .word 0000        ; #2077 voc-link
 
 ;!!!
@@ -968,54 +968,6 @@ NFA "TRAVERSE"
 @2F97:
    .word _EXIT            ; #2f97 21A8 - EXIT
 
-NFA2 ">BODY", "_3EBODY"
-   call _FCALL            ; 2FA1
-   .word _CFL             ; #2fa4 2F44 - CFL
-   .word __2B             ; #2fa6 22ED - +
-   .word _EXIT            ; #2fa8 21A8 - EXIT
-
-NFA2 "BODY>", "BODY_3E"
-   call _FCALL            ; 2FB2
-   .word _CFL             ; #2fb5 2F44 - CFL
-   .word __2D             ; #2fb7 22F8 - -
-   .word _EXIT            ; #2fb9 21A8 - EXIT
-
-NFA2 ">NAME", "_3ENAME"
-   call _FCALL            ; 2FC3
-   .word _2_2D            ; #2fc6 233C - 2-
-   .word __2D1            ; #2fc8 2B22 - -1
-   .word _TRAVERSE        ; #2fca 2F54 - TRAVERSE
-   .word _EXIT            ; #2fcc 21A8 - EXIT
-
-NFA2 "NAME>", "NAME_3E"
-   call _FCALL            ; 2FD6
-   .word _1               ; #2fd9 2B34 - 1
-   .word _TRAVERSE        ; #2fdb 2F54 - TRAVERSE
-   .word _2_2B            ; #2fdd 2325 - 2+
-   .word _EXIT            ; #2fdf 21A8 - EXIT
-
-NFA2 ">LINK", "_3ELINK"
-   call _FCALL            ; 2FE9
-   .word _2_2D            ; #2fec 233C - 2-
-   .word _EXIT            ; #2fee 21A8 - EXIT
-
-NFA2 "LINK>", "LINK_3E"
-   call _FCALL            ; 2FF8
-   .word _2_2B            ; #2ffb 2325 - 2+
-   .word _EXIT            ; #2ffd 21A8 - EXIT
-
-NFA2 "N>LINK", "N_3ELINK"
-   call _FCALL            ; 3008
-   .word _1               ; #300b 2B34 - 1
-   .word _TRAVERSE        ; #300d 2F54 - TRAVERSE
-   .word _EXIT            ; #300f 21A8 - EXIT
-
-NFA2 "L>NAME", "L_3ENAME"
-   call _FCALL            ; 301A
-   .word __2D1            ; #301d 2B22 - -1
-   .word _TRAVERSE        ; #301f 2F54 - TRAVERSE
-   .word _EXIT            ; #3021 21A8 - EXIT
-
 NFA "WORD"
    call _FCALL            ; 302A
    .word _LIT             ; #302d 28C7 - LIT
@@ -1159,211 +1111,6 @@ NFA "EXPECT"
    .word __21             ; #3135 2839 - !
    .word _EXIT            ; #3137 21A8 - EXIT
 
-NFA2 ">PRT", "_3EPRT"
-   call _FCALL            ; 3140
-   .word _LIT             ; #3143 28C7 - LIT
-   .word 0x007F           ; #3145 007F
-   .word _MAX             ; #3147 2381 - MAX
-   .word _BL              ; #3149 3289 - BL
-   .word _MAX             ; #314b 2381 - MAX
-   .word _EXIT            ; #314d 21A8 - EXIT
-
-NFA "PTYPE"
-   call _FCALL            ; 3157
-   .word _0               ; #315a 2B2B - 0
-   .word __28_3FDO_29     ; #315c 29B8 - (?DO)
-   .word @316E            ; #315e 316E
-@3160:
-   .word _DUP             ; #3160 2277 - DUP
-   .word _C_40            ; #3162 282D - C@
-   .word __3EPRT          ; #3164 3140 - >PRT
-   .word _EMIT            ; #3166 3189 - EMIT
-   .word _1_2B            ; #3168 231A - 1+
-   .word __28LOOP_29      ; #316a 29DA - (LOOP)
-   .word @3160            ; #316c 3160
-@316E:
-   .word _DROP            ; #316e 222D - DROP
-   .word _EXIT            ; #3170 21A8 - EXIT
-
-NFA "EMIT"
-   call _FCALL            ; 3189
-   .word _LIT             ; #318c 28C7 - LIT
-   .word l600e            ; #318e 600E
-   .word __40             ; #3190 2820 - @
-   .word _EXECUTE         ; #3192 21BF - EXECUTE
-   .word __3EOUT          ; #3194 216B - >OUT
-   .word _1_2B_21         ; #3196 28A6 - 1+!
-   .word _EXIT            ; #3198 21A8 - EXIT
-
-NFA "KEY"
-   call _FCALL            ; 31A0
-   .word _LIT             ; #31a3 28C7 - LIT
-   .word l600c            ; #31a5 600C
-   .word __40             ; #31a7 2820 - @
-   .word _EXECUTE         ; #31a9 21BF - EXECUTE
-   .word _EXIT            ; #31ab 21A8 - EXIT
-
-NFA "TYPE"
-   call _FCALL            ; 31B4
-   .word _LIT             ; #31b7 28C7 - LIT
-   .word l6012            ; #31b9 6012
-   .word __40             ; #31bb 2820 - @
-   .word __3FDUP          ; #31bd 2284 - ?DUP
-   .word __3FBRANCH       ; #31bf 2916 - ?BRANCH
-   .word @31C7            ; #31c1 31C7
-   .word _EXECUTE         ; #31c3 21BF - EXECUTE
-   .word _EXIT            ; #31c5 21A8 - EXIT
-@31C7:
-   .word _0               ; #31c7 2B2B - 0
-   .word __28_3FDO_29     ; #31c9 29B8 - (?DO)
-   .word @31D9            ; #31cb 31D9
-@31CD:
-   .word _DUP             ; #31cd 2277 - DUP
-   .word _C_40            ; #31cf 282D - C@
-   .word _EMIT            ; #31d1 3189 - EMIT
-   .word _1_2B            ; #31d3 231A - 1+
-   .word __28LOOP_29      ; #31d5 29DA - (LOOP)
-   .word @31CD            ; #31d7 31CD
-@31D9:
-   .word _DROP            ; #31d9 222D - DROP
-   .word _EXIT            ; #31db 21A8 - EXIT
-
-NFA2 ">CH", "_3ECH"
-   call _FCALL            ; 31E3
-   .word __3EIN           ; #31e6 2153 - >IN
-   .word __40             ; #31e8 2820 - @
-   .word _DUP             ; #31ea 2277 - DUP
-   .word __23TIB          ; #31ec 2148 - #TIB
-   .word __40             ; #31ee 2820 - @
-   .word _U_3C            ; #31f0 239D - U<
-   .word _N_3FBRANCH      ; #31f2 2934 - N?BRANCH
-   .word @31FE            ; #31f4 31FE
-   .word _DROP            ; #31f6 222D - DROP
-   .word _FALSE           ; #31f8 2B56 - FALSE
-   .word _BRANCH          ; #31fa 2904 - BRANCH
-   .word @320A            ; #31fc 320A
-@31FE:
-   .word _TIB             ; #31fe 2176 - TIB
-   .word __2B             ; #3200 22ED - +
-   .word _C_40            ; #3202 282D - C@
-   .word __3EIN           ; #3204 2153 - >IN
-   .word _1_2B_21         ; #3206 28A6 - 1+!
-   .word _TRUE            ; #3208 2B49 - TRUE
-@320A:
-   .word _EXIT            ; #320a 21A8 - EXIT
-
-NFA2 "FORTH-83", "FORTH_2D83"
-   call _FCALL            ; 3217
-   .word _CR              ; #321a 454C - CR
-   .word __28_2E_22_29    ; #321c 3421 - (.")
-   .byte 17
-   .stringmap russian,"CTAHДAPT FORTH-83"
-   .word _EXIT            ; #3230 21A8 - EXIT
-
-NFA2 ";S", "_3BS"
-   call _FCALL            ; 3253
-   .word _RDROP           ; #3256 2811 - RDROP
-   .word _EXIT            ; #3258 21A8 - EXIT
-
-NFA "HEX"
-   call _FCALL            ; 3260
-   .word _LIT             ; #3263 28C7 - LIT
-   .word 0x0010           ; #3265 0010
-   .word _BASE            ; #3267 20C8 - BASE
-   .word __21             ; #3269 2839 - !
-   .word _EXIT            ; #326b 21A8 - EXIT
-
-NFA "DECIMAL"
-   call _FCALL            ; 3277
-   .word _LIT             ; #327a 28C7 - LIT
-   .word 0x000A           ; #327c 000A
-   .word _BASE            ; #327e 20C8 - BASE
-   .word __21             ; #3280 2839 - !
-   .word _EXIT            ; #3282 21A8 - EXIT
-
-NFA "BLANK"
-   call _FCALL            ; 3296
-   .word _BL              ; #3299 3289 - BL
-   .word _FILL            ; #329b 2AA1 - FILL
-   .word _EXIT            ; #329d 21A8 - EXIT
-
-NFA "SPACE"
-   call _FCALL            ; 32A7
-   .word _BL              ; #32aa 3289 - BL
-   .word _EMIT            ; #32ac 3189 - EMIT
-   .word _EXIT            ; #32ae 21A8 - EXIT
-
-NFA "SPACES"
-   call _FCALL            ; 32B9
-   .word _0               ; #32bc 2B2B - 0
-   .word __28_3FDO_29     ; #32be 29B8 - (?DO)
-   .word @32C8            ; #32c0 32C8
-@32C2:
-   .word _SPACE           ; #32c2 32A7 - SPACE
-   .word __28LOOP_29      ; #32c4 29DA - (LOOP)
-   .word @32C2            ; #32c6 32C2
-@32C8:
-   .word _EXIT            ; #32c8 21A8 - EXIT
-
-NFA2 "ID.", "ID_2E"
-   call _FCALL            ; 32D0
-   .word _COUNT           ; #32d3 2BD2 - COUNT
-   .word _LIT             ; #32d5 28C7 - LIT
-   .word 0x003F           ; #32d7 003F
-   .word _AND             ; #32d9 2764 - AND
-   .word _TYPE            ; #32db 31B4 - TYPE
-   .word _EXIT            ; #32dd 21A8 - EXIT
-
-NFA "DEFINITIONS"
-   call _FCALL            ; 32ED
-   .word _CONTEXT         ; #32f0 20E4 - CONTEXT
-   .word __40             ; #32f2 2820 - @
-   .word _CURRENT         ; #32f4 20F3 - CURRENT
-   .word __21             ; #32f6 2839 - !
-   .word _EXIT            ; #32f8 21A8 - EXIT
-
-NFA "LATEST"
-   call _FCALL            ; 3303
-   .word _CURRENT         ; #3306 20F3 - CURRENT
-   .word __40             ; #3308 2820 - @
-   .word __40             ; #330a 2820 - @
-   .word _EXIT            ; #330c 21A8 - EXIT
-
-NFA "TITLE"
-   call _FCALL            ; 34C7
-   .word _CR              ; #34ca 454C - CR
-   .word __28_2E_22_29    ; #34cc 3421 - (.")
-   .byte 34
-   .stringmap russian,"ФOPT-7970 BEPCИЯ 6.2 OT 19.06.85  "
-   .word __28_2E_22_29    ; #34f1 3421 - (.")
-   .byte 19
-   .stringmap russian,"(CTAHДAPT FORTH-83)"
-   .word _CR              ; #3507 454C - CR
-   .word __28_2E_22_29    ; #3509 3421 - (.")
-   .byte 43
-   .stringmap russian,"    B.A.KИPИЛЛИH A.A.KЛУБOBИЧ H.P.HOЗДPУHOB"
-   .word _CR              ; #3537 454C - CR
-   .word _LIT             ; #3539 28C7 - LIT
-   .word 0x0014           ; #353b 0014
-   .word _SPACES          ; #353d 32B9 - SPACES
-   .word __28_2E_22_29    ; #353f 3421 - (.")
-   .byte 7
-   .stringmap russian,"BЦ  ЛГУ"
-   .word _CR              ; #3549 454C - CR
-   .word __28_2E_22_29    ; #354b 3421 - (.")
-   .byte 50
-   .stringmap russian,"198904 ЛEHИHГPAД ПETPOДBOPEЦ БИБЛИOTEЧHAЯ ПЛ. Д. 2"
-   .word _CR              ; #3580 454C - CR
-   .word _LIT             ; #3582 28C7 - LIT
-   .word l600a            ; #3584 600A
-   .word __40             ; #3586 2820 - @
-   .word __3FDUP          ; #3588 2284 - ?DUP
-   .word __3FBRANCH       ; #358a 2916 - ?BRANCH
-   .word @3590            ; #358c 3590
-   .word _EXECUTE         ; #358e 21BF - EXECUTE
-@3590:
-   .word _EXIT            ; #3590 21A8 - EXIT
-
 NFA "CONVERT"
    call _FCALL            ; 359C
 @359F:
@@ -1478,6 +1225,15 @@ NFA2 "(EMIT)", "_28EMIT_29"
    call PRINT_CHAR ; #453c cd 09 f8
    pop b           ; #453f c1
    jmp _FNEXT      ; #4544 c3 9a 21
+
+NFA2 "", "", IMMEDIATE
+   call _FCALL            ; 3175
+   .word _INLINE          ; #3178 3096 - INLINE
+   .word _N_3FBRANCH      ; #317a 2934 - N?BRANCH
+   .word @3180            ; #317c 3180
+   .word _RDROP           ; #317e 2811 - RDROP
+@3180:
+   .word _EXIT            ; #3180 21A8 - EXIT
 
 NFA "ENCLOSE"
    mov h,b         ; #2adf 60
