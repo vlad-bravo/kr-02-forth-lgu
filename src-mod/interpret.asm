@@ -12,123 +12,6 @@
 .DEF PREV_NFA PREV_NFA_INTERPRET
 .DEF PREFIX PREFIX_INTERPRET
 
-NFA "INTERPRET"
-   call _FCALL
-   .word _LIT             ; LIT
-   .word l6004            ; 
-   .word __40             ; @
-   .word __3FDUP          ; ?DUP
-   .word __3FBRANCH       ; ?BRANCH
-   .word @3696            ; 
-   .word _EXECUTE         ; EXECUTE
-   .word _EXIT            ; EXIT
-@3696:
-   .word _BL              ; BL
-   .word _WORD            ; WORD
-   .word i_FIND           ; FIND
-   .word _DUP             ; DUP
-   .word __3FBRANCH       ; ?BRANCH
-   .word @36BA            ; 
-   .word _0_3C            ; 0<
-   .word _STATE           ; STATE
-   .word __40             ; @
-   .word _AND             ; AND
-   .word __3FBRANCH       ; ?BRANCH
-   .word @36B4            ; 
-   .word __2C             ; ,
-   .word _BRANCH          ; BRANCH
-   .word @36B6            ; 
-@36B4:
-   .word _EXECUTE         ; EXECUTE
-@36B6:
-   .word _BRANCH          ; BRANCH
-   .word @36D2            ; 
-@36BA:
-   .word _DROP            ; DROP
-   .word _NUMBER          ; NUMBER
-   .word _DPL             ; DPL
-   .word __40             ; @
-   .word _1_2B            ; 1+
-   .word __3FBRANCH       ; ?BRANCH
-   .word @36CE            ; 
-   .word i_DLITERAL       ; DLITERAL
-   .word _BRANCH          ; BRANCH
-   .word @36D2            ; 
-@36CE:
-   .word _DROP            ; DROP
-   .word i_LITERAL        ; LITERAL
-@36D2:
-   .word __3FSTACK        ; ?STACK
-   .word _BRANCH          ; BRANCH
-   .word @3696            ; 
-   .word _EXIT            ; EXIT
-
-NFA "QUIT"
-   call _FCALL
-   .word _LIT             ; LIT
-   .word l6000            ; 
-   .word __40             ; @
-   .word __3FDUP          ; ?DUP
-   .word __3FBRANCH       ; ?BRANCH
-   .word @2D1B            ; 
-   .word _EXECUTE         ; EXECUTE
-@2D1B:
-   .word _R0              ; R0
-   .word __40             ; @
-   .word _RP_21           ; RP!
-   .word _STANDIO         ; STANDIO
-   .word _CR              ; CR
-   .word __5B             ; [
-   .word _FORTH           ; FORTH
-   .word _DEFINITIONS     ; DEFINITIONS
-@2D2B:
-   .word i_INTERPRET      ; INTERPRET
-   .word _BRANCH          ; BRANCH
-   .word @2D2B            ; 
-   .word _EXIT            ; EXIT
-
-NFA "PROMPT"
-   call _FCALL
-; Буква режима работы
-; STATE @ IF C" C ELSE C" I THEN EMIT
-   .word _STATE, __40, __3FBRANCH, @B1
-   .word _LIT, 0x43, _BRANCH, @B2  ; C - режим компиляции
-@B1:
-   .word _LIT, 0x49                ; I - режим интерпретации
-@B2:
-   .word _EMIT
-; Система счисления
-   .word _BASE            ; BASE
-   .word __40             ; @
-   .word _DUP             ; DUP
-   .word _DECIMAL         ; DECIMAL
-   .word _2               ; 2
-   .word __2ER            ; .R
-   .word _BASE            ; BASE
-   .word __21             ; !
-; Галочка с пробелом
-   .word _LIT, 0x3e       ; LIT ">"
-   .word _EMIT, _SPACE, _EXIT
-
-NFA "QUERY"
-   call _FCALL            ; 4569
-   .word _CR              ; #456c 454C - CR
-   .word i_PROMPT
-;   .word _LIT             ; #456e 28C7 - LIT
-;   .word 0x003E           ; #4570 003E
-;   .word _EMIT            ; #4572 3189 - EMIT
-   .word _TIB             ; #4574 2176 - TIB
-   .word _LIT             ; #4576 28C7 - LIT
-   .word 0x004F           ; #4578 004F
-   .word _EXPECT          ; #457a 30C2 - EXPECT
-   .word _CR              ; #457c 454C - CR
-   .word _TIB             ; #457e 2176 - TIB
-   .word _SPAN            ; #4580 215F - SPAN
-   .word __40             ; #4582 2820 - @
-   .word _0               ; #4584 2B2B - 0
-   .word _TRUE            ; #4586 2B49 - TRUE
-   .word _EXIT            ; #4588 21A8 - EXIT
-
 NFA2 "S.", "S_2E"
    call _FCALL            ; 3C1F
    .word _DEPTH           ; #3c22 3915 - DEPTH
@@ -400,31 +283,6 @@ NFA2 "[']", "_5B_27_5D", IMMEDIATE
    .word i_LITERAL        ; #3469 3477 - LITERAL
    .word _EXIT            ; #346b 21A8 - EXIT
 
-NFA2 "LITERAL", "LITERAL", IMMEDIATE
-   call _FCALL            ; 3477
-   .word _STATE           ; #347a 20D5 - STATE
-   .word __40             ; #347c 2820 - @
-   .word __3FBRANCH       ; #347e 2916 - ?BRANCH
-   .word @3488            ; #3480 3488
-   .word _COMPILE         ; #3482 2BE9 - COMPILE
-   .word _LIT             ; #3484 28C7 - LIT
-   .word __2C             ; #3486 2B80 - ,
-@3488:
-   .word _EXIT            ; #3488 21A8 - EXIT
-
-NFA2 "DLITERAL", "DLITERAL", IMMEDIATE
-   call _FCALL            ; 3495
-   .word _STATE           ; #3498 20D5 - STATE
-   .word __40             ; #349a 2820 - @
-   .word __3FBRANCH       ; #349c 2916 - ?BRANCH
-   .word @34A8            ; #349e 34A8
-   .word _COMPILE         ; #34a0 2BE9 - COMPILE
-   .word _DLIT            ; #34a2 28D8 - DLIT
-   .word __2C             ; #34a4 2B80 - ,
-   .word __2C             ; #34a6 2B80 - ,
-@34A8:
-   .word _EXIT            ; #34a8 21A8 - EXIT
-
 NFA2 "[COMPILE]", "_5BCOMPILE_5D", IMMEDIATE
    call _FCALL            ; 34B6
    .word i__27            ; #34b9 344B - '
@@ -587,14 +445,6 @@ NFA2 ";", "_3B", IMMEDIATE
    .word i__5B            ; #38f0 3354 - [
    .word _EXIT            ; #38f2 21A8 - EXIT
 
-NFA "IMMEDIATE"
-   call _FCALL            ; 3900
-   .word _LATEST          ; #3903 3303 - LATEST
-   .word _LIT             ; #3905 28C7 - LIT
-   .word 0x0080           ; #3907 0080
-   .word _TOGGLE          ; #3909 2982 - TOGGLE
-   .word _EXIT            ; #390b 21A8 - EXIT
-
 NFA2 "!CSP", "_21CSP"
    call _FCALL            ; 37F9
    .word _SP_40           ; #37fc 22D6 - SP@
@@ -649,65 +499,6 @@ NFA2 "?CURRENT", "_3FCURRENT"
    .word __28ABORT_22_29  ; #3c7f 2D61 - (ABORT")
    .byte 4," - ?"
    .word _EXIT            ; #3c86 21A8 - EXIT
-
-NFA "FIND"
-   call _FCALL            ; 3373
-   .word _LIT             ; #3376 28C7 - LIT
-   .word l6006            ; #3378 6006
-   .word __40             ; #337a 2820 - @
-   .word __3FDUP          ; #337c 2284 - ?DUP
-   .word __3FBRANCH       ; #337e 2916 - ?BRANCH
-   .word @3386            ; #3380 3386
-   .word _EXECUTE         ; #3382 21BF - EXECUTE
-   .word _EXIT            ; #3384 21A8 - EXIT
-@3386:
-   .word _CONTEXT         ; #3386 20E4 - CONTEXT
-   .word __40             ; #3388 2820 - @
-   .word __3FWORD         ; #338a 26DB - ?WORD
-   .word __3FBRANCH       ; #338c 2916 - ?BRANCH
-   .word @3396            ; #338e 3396
-   .word _TRUE            ; #3390 2B49 - TRUE
-   .word _BRANCH          ; #3392 2904 - BRANCH
-   .word @33B0            ; #3394 33B0
-@3396:
-   .word _CURRENT         ; #3396 20F3 - CURRENT
-   .word __40             ; #3398 2820 - @
-   .word _DUP             ; #339a 2277 - DUP
-   .word _CONTEXT         ; #339c 20E4 - CONTEXT
-   .word __40             ; #339e 2820 - @
-   .word __3D             ; #33a0 2409 - =
-   .word _N_3FBRANCH      ; #33a2 2934 - N?BRANCH
-   .word @33AC            ; #33a4 33AC
-   .word __3FWORD         ; #33a6 26DB - ?WORD
-   .word _BRANCH          ; #33a8 2904 - BRANCH
-   .word @33B0            ; #33aa 33B0
-@33AC:
-   .word _DROP            ; #33ac 222D - DROP
-   .word _FALSE           ; #33ae 2B56 - FALSE
-@33B0:
-   .word __3FBRANCH       ; #33b0 2916 - ?BRANCH
-   .word @33D2            ; #33b2 33D2
-   .word _DUP             ; #33b4 2277 - DUP
-   .word _NAME_3E         ; #33b6 2FD6 - NAME>
-   .word _SWAP            ; #33b8 2238 - SWAP
-   .word _C_40            ; #33ba 282D - C@
-   .word _LIT             ; #33bc 28C7 - LIT
-   .word 0x0080           ; #33be 0080
-   .word _AND             ; #33c0 2764 - AND
-   .word __3FBRANCH       ; #33c2 2916 - ?BRANCH
-   .word @33CC            ; #33c4 33CC
-   .word _1               ; #33c6 2B34 - 1
-   .word _BRANCH          ; #33c8 2904 - BRANCH
-   .word @33CE            ; #33ca 33CE
-@33CC:
-   .word __2D1            ; #33cc 2B22 - -1
-@33CE:
-   .word _BRANCH          ; #33ce 2904 - BRANCH
-   .word @33D4            ; #33d0 33D4
-@33D2:
-   .word _FALSE           ; #33d2 2B56 - FALSE
-@33D4:
-   .word _EXIT            ; #33d4 21A8 - EXIT
 
 NFA2 "+WORD", "_2BWORD"
    call _FCALL            ; 33DE

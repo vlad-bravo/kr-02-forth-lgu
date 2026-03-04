@@ -4,7 +4,6 @@
 .include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
-.include "life.inc"
 
 .SECTION "life_manual" FREE
 
@@ -103,7 +102,7 @@ NFA "COUNTNEIGHBORS"
 ; Начало видеопамяти
 NFA "VIDMEM"
    call __40
-   .word line00
+   .word 0x76D0
 
 ; Размер экрана
 NFA "SIZE"

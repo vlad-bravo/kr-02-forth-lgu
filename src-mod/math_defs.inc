@@ -1,0 +1,10 @@
+.def _S_3ED m_S_3ED
+.def _M_2A m_M_2A
+.def __2F m__2F
+.def _MOD m_MOD
+.def _DABS m_DABS
+.def _U_2F m_U_2F
+.def _UM_2FMOD m_UM_2FMOD
+.def _M_2FMOD m_M_2FMOD
+.def __2A_2FMOD m__2A_2FMOD
+.def __2A_2F m__2A_2F

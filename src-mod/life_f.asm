@@ -1,15 +1,15 @@
-
 .include "memorymap.inc"
 .include "ext_names.inc"
 .include "nfa.inc"
 .include "..\src\ramdefs.inc"
 .include "..\src\monitor.inc"
-.include "life.inc"
 
-.SECTION "compiled" FREE
+.stringmaptable russian "russian.tbl"
 
-.DEF PREV_NFA PREV_NFA_COMPILED
-.DEF PREFIX PREFIX_COMPILED
+.SECTION "LIFE_F" FREE
+
+.DEF PREV_NFA PREV_NFA_LIFE_F
+.DEF PREFIX PREFIX_LIFE_F
 
 ; Определение слов для последующей компиляции
 NFA "FLD"

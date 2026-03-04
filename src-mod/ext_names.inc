@@ -1,7 +1,9 @@
 
+.include "forth_defs.inc"
+.include "interpret_defs.inc"
+.include "math_defs.inc"
+
 ; From interpret.asm
-.def _QUIT i_QUIT
-.def _QUERY i_QUERY
 .def _CREATE i_CREATE
 .def __3FEXEC i__3FEXEC
 .def __21CSP i__21CSP

@@ -1,27 +1,7 @@
+import argparse
+
 from filtr import filtr_string
 from words import find_word
-
-file_in = "compile.f"
-file_out = "compiled.asm"
-
-LFA_OUT = "NFA_EXIT"
-
-HEADER = """
-.include "memorymap.inc"
-.include "ext_names.inc"
-.include "nfa.inc"
-.include "..\\src\\ramdefs.inc"
-.include "..\\src\\monitor.inc"
-.include "life.inc"
-
-.SECTION "compiled" FREE
-
-.DEF PREV_NFA PREV_NFA_COMPILED
-.DEF PREFIX PREFIX_COMPILED
-
-"""
-
-FOOTER = ".ENDS\n"
 
 def is_hex(s):
     try:
@@ -94,10 +74,12 @@ class TextSplitter:
         return result if result else None
 
 class Context:
-    def __init__(self, splitter):
+    def __init__(self, splitter, prefix):
         self.splitter = splitter
+        self.prefix = prefix
+        self.is_prefix = len(prefix) > 0
+        self.prefix_defs = []
         self.state = 'interpret'
-        self.prev_nfa = LFA_OUT
         self.label_count = 0
         self.label_stack = []
 
@@ -105,7 +87,7 @@ class Context:
         forth_word = find_word(word)
         if forth_word:
             if forth_word.immediate:
-                result = forth_word.action(self)
+                result = forth_word.action(self, forth_word)
             else:
                 result = '_', forth_word.name
         else:
@@ -125,8 +107,17 @@ class Context:
             result = self.write_word(text) + '\n'
         elif type == '(")':
             result = self.write_word(type) + f"\n   .byte {len(text)},\"{text}\""
+        elif type == '(ABORT")':
+            result = (
+                f"{self.write_word(type)}\n"
+                f"   .byte {len(text)}\n"
+                f"   .stringmap russian,\"{text}\""
+            )
         elif type == 'C"':
             result = f"   .word _LIT, 0x{ord(text):<7x}; C\" {text}"
+        elif type == '[comp]':
+            int_name = filtr_string(text)
+            result = f"   .word _LIT,{int_name:<10}; [COMPILE] {text}"
         elif type == 'if':
             self.label_count += 1
             self.label_stack.append(self.label_count)
@@ -174,6 +165,15 @@ class Context:
         elif type == 'again':
             label = self.label_stack.pop()
             result = f"   .word _BRANCH,@B{label}    ; BRANCH @B{label}"
+        elif type == 'repeat':
+            self.label_count += 1
+            self.label_stack.append(self.label_count)
+            result = f"@B{self.label_count}:"
+        elif type == 'until':
+            label = self.label_stack.pop()
+            result = f"   .word __3FBRANCH,@B{label} ; ?BRANCH @B{label}"
+        elif type == 'lit_const':
+            result = f"   .word _LIT,{text:<10}; {text}"
         else:
             result = self.write_default(text)
         return result
@@ -183,8 +183,16 @@ class Context:
         if int_name == name:
             result = f"NFA \"{name}\"\n   call _FCALL"
         else:
-            result = f"NFA2 \"{name}\", \"{int_name}\"\n   call _FCALL"
+            mask_name = ''
+            for char in name:
+                if char == '"':
+                    mask_name += '\\"'
+                else:
+                    mask_name += char
+            result = f"NFA2 \"{mask_name}\", \"{int_name}\"\n   call _FCALL"
         self.label_count = 0
+        if self.is_prefix:
+            self.prefix_defs.append(f".def _{int_name} {self.prefix}_{int_name}\n")
         return result
 
     def write_word(self, name):
@@ -198,7 +206,9 @@ class Context:
         else:
             return self.write_word(text)
 
-def process_file():
+def process_file(filename: str, prefix: str):
+    file_in = f"{filename}.f"
+    file_out = f"{filename}_f.asm"
     try:
         with open(file_in, 'r', encoding='utf-8') as f:
             text = f.read()
@@ -206,11 +216,26 @@ def process_file():
         print(f"Ошибка: Файл '{file_in}' не найден.")
         return
 
-    with open(file_out, 'w', encoding='utf-8') as f:
-        f.write(HEADER)
+    splitter = TextSplitter(text)
+    context = Context(splitter, prefix)
 
-        splitter = TextSplitter(text)
-        context = Context(splitter)
+    with open(file_out, 'w', encoding='utf-8') as f:
+        f.write(
+            '.include "memorymap.inc"\n'
+            '.include "ext_names.inc"\n'
+            '.include "nfa.inc"\n'
+            '.include "..\\src\\ramdefs.inc"\n'
+            '.include "..\\src\\monitor.inc"\n'
+            '\n'
+            '.stringmaptable russian "russian.tbl"\n'
+            '\n'
+            f'.SECTION "{filename.upper()}_F" FREE\n'
+            '\n'
+            f'.DEF PREV_NFA PREV_NFA_{filename.upper()}_F\n'
+            f'.DEF PREFIX PREFIX_{filename.upper()}_F\n'
+            '\n'
+        )
+
         while True:
             word = splitter.следующий(' ')
             if word:
@@ -219,7 +244,18 @@ def process_file():
                 f.write(out_text + '\n')
             else:
                 break
-        f.write(FOOTER)
+
+        f.write(".ENDS\n")
+
+    if context.is_prefix:
+        with open(f"{filename}_defs.inc", 'w', encoding='utf-8') as f:
+            for line in context.prefix_defs:
+                f.write(line)
 
 if __name__ == "__main__":
-    process_file()
+    parser = argparse.ArgumentParser(description='Транслятор FORTH')
+    parser.add_argument('filename', type=str,
+                        help='имя файла без расширения')
+    parser.add_argument('--prefix', type=str, required=False, default='')
+    args = parser.parse_args()
+    process_file(args.filename, args.prefix)
