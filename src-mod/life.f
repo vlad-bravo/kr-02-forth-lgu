@@ -110,15 +110,6 @@
 
 : HH " HELLO, HABR!" COUNT TYPE ;
 
-: PROMPT2 ( -- )
-  \ Режим трансляции
-  STATE @ IF C" C ELSE C" I THEN EMIT
-  \ Система счисления
-  BASE @ DUP DECIMAL 2 .R BASE !
-  \ Галочка и пробел
-  C" > EMIT SPACE
-;
-
 \ division, floored
 \     Integer division in which the remainder carries  the  sign  of
 \     the  divisor  or  is zero,  and the quotient is rounded to its
