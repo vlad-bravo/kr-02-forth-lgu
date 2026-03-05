@@ -40,69 +40,51 @@
     EXIT
   THEN
   R@ 1+ @ DUP CALL =
-  IF
-\ ?BRANCH @3F16
+  IF \ ?BRANCH @3F16
     ." : "
-  DROP R> DUP ?NAME2 CFL +
-\ @3E65:
-  DUP @ LIT EXIT <>
-  IF
-\ ?BRANCH @3F0A
-    DUP DUP @ LIT (") =
-    IF
-\ ?BRANCH @3E93
-      C" " EMIT SPACE 2+ STR
-    ELSE
-\ BRANCH @3F06
-\ @3E93:
-      DUP @ LIT (.") =
-      IF
-\ ?BRANCH @3EB7
-        C" . EMIT C" " EMIT SPACE 2+ STR
-      ELSE
-\ BRANCH @3F06
-\ @3EB7:
-        DUP @ LIT (ABORT") =
+    DROP R> DUP ?NAME2 CFL +
+    BEGIN \ @3E65:
+      DUP @ [COMPILE] EXIT <>
+      IF \ ?BRANCH @3F0A
+        DUP DUP @ [COMPILE] (") =
         IF
-\ ?BRANCH @3EDB
-          ." ABORT"
-          C" " EMIT 2+ STR
+          C" " EMIT SPACE 2+ STR
         ELSE
-\ BRANCH @3F06
-\ @3EDB:
-          DUP @ LIT LIT =
+          DUP @ [COMPILE] (.") =
           IF
-\ ?BRANCH @3EFE
-            ." LIT " 2+ DUP @ ?NAME2 2+
+            C" . EMIT C" " EMIT SPACE 2+ STR
           ELSE
-\ BRANCH @3F06
-\ @3EFE:
-            DUP @ ?NAME2 2+
-          ELSE
-\ @3F06:
-\ BRANCH @3E65
+            DUP @ [COMPILE] (ABORT") =
+            IF
+              ." ABORT" C" " EMIT 2+ STR
+            ELSE
+              DUP @ [COMPILE] LIT =
+              IF
+                ." LIT " 2+ DUP @ ?NAME2 2+
+              ELSE
+                DUP @ ?NAME2 2+
+              THEN
+            THEN
+          THEN
+        THEN
+      THEN
+    AGAIN \ BRANCH @3E65
 \ @3F0A:
-   ." ;" CR DROP
-   ELSE
-\ BRANCH @3F7C
-\ @3F16:
-     R> ?NAME2 DUP NEXT =
-     IF
-\ ?BRANCH @3F38
-   ." - ПEPEMEHHAЯ "
-     ELSE
-\ BRANCH @3F7C
-\ @3F38:
-       LIT @ =
-       IF
-\ ?BRANCH @3F56
-   ." - KOHCTAHTA  "
-   ELSE
-\ BRANCH @3F7C
-\ @3F56:
-   ." - OПPEДEЛEHИE ЧEPEЗ CREATE - DOES> "
+    ." ;" CR DROP
+  ELSE \ BRANCH @3F7C \ @3F16:
+    R> ?NAME2 DUP NEXT =
+    IF \ ?BRANCH @3F38
+    ." - ПEPEMEHHAЯ "
+    ELSE \ BRANCH @3F7C \ @3F38:
+      [COMPILE] @ =
+      IF \ ?BRANCH @3F56
+        ." - KOHCTAHTA  "
+      ELSE \ BRANCH @3F7C \ @3F56:
+        ." - OПPEДEЛEHИE ЧEPEЗ CREATE - DOES> "
 \ @3F7C:
-  THEN THEN THEN
+      THEN
+    THEN
+  THEN
 ;
 
 : ?NAME2

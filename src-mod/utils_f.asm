@@ -141,38 +141,32 @@ NFA "DISFORT2"
    .word __3FNAME2      ; ?NAME2
    .word _CFL           ; CFL
    .word __2B           ; +
+@B3:
 ; @3E65:
    .word _DUP           ; DUP
    .word __40           ; @
-   .word _LIT           ; LIT
-   .word _EXIT          ; EXIT
+   .word _LIT,_EXIT     ; [COMPILE] EXIT
    .word __3C_3E        ; <>
-   .word __3FBRANCH,@B3 ; ?BRANCH @B3
+   .word __3FBRANCH,@B4 ; ?BRANCH @B4
 ; ?BRANCH @3F0A
    .word _DUP           ; DUP
    .word _DUP           ; DUP
    .word __40           ; @
-   .word _LIT           ; LIT
-   .word __28_22_29     ; (")
+   .word _LIT,__28_22_29; [COMPILE] (")
    .word __3D           ; =
-   .word __3FBRANCH,@B4 ; ?BRANCH @B4
-; ?BRANCH @3E93
+   .word __3FBRANCH,@B5 ; ?BRANCH @B5
    .word _LIT, 0x22     ; C" "
    .word _EMIT          ; EMIT
    .word _SPACE         ; SPACE
    .word _2_2B          ; 2+
    .word _STR           ; STR
-   .word _BRANCH,@B5    ; BRANCH @B5
-@B4:
-; BRANCH @3F06
-; @3E93:
+   .word _BRANCH,@B6    ; BRANCH @B6
+@B5:
    .word _DUP           ; DUP
    .word __40           ; @
-   .word _LIT           ; LIT
-   .word __28_2E_22_29  ; (.")
+   .word _LIT,__28_2E_22_29; [COMPILE] (.")
    .word __3D           ; =
-   .word __3FBRANCH,@B6 ; ?BRANCH @B6
-; ?BRANCH @3EB7
+   .word __3FBRANCH,@B7 ; ?BRANCH @B7
    .word _LIT, 0x2e     ; C" .
    .word _EMIT          ; EMIT
    .word _LIT, 0x22     ; C" "
@@ -180,17 +174,13 @@ NFA "DISFORT2"
    .word _SPACE         ; SPACE
    .word _2_2B          ; 2+
    .word _STR           ; STR
-   .word _BRANCH,@B7    ; BRANCH @B7
-@B6:
-; BRANCH @3F06
-; @3EB7:
+   .word _BRANCH,@B8    ; BRANCH @B8
+@B7:
    .word _DUP           ; DUP
    .word __40           ; @
-   .word _LIT           ; LIT
-   .word __28ABORT_22_29; (ABORT")
+   .word _LIT,__28ABORT_22_29; [COMPILE] (ABORT")
    .word __3D           ; =
-   .word __3FBRANCH,@B8 ; ?BRANCH @B8
-; ?BRANCH @3EDB
+   .word __3FBRANCH,@B9 ; ?BRANCH @B9
    .word __28_2E_22_29  ; (.")
    .byte 5
    .stringmap russian,"ABORT"
@@ -198,17 +188,13 @@ NFA "DISFORT2"
    .word _EMIT          ; EMIT
    .word _2_2B          ; 2+
    .word _STR           ; STR
-   .word _BRANCH,@B9    ; BRANCH @B9
-@B8:
-; BRANCH @3F06
-; @3EDB:
+   .word _BRANCH,@B10    ; BRANCH @B10
+@B9:
    .word _DUP           ; DUP
    .word __40           ; @
-   .word _LIT           ; LIT
-   .word _LIT           ; LIT
+   .word _LIT,_LIT      ; [COMPILE] LIT
    .word __3D           ; =
-   .word __3FBRANCH,@B10 ; ?BRANCH @B10
-; ?BRANCH @3EFE
+   .word __3FBRANCH,@B11 ; ?BRANCH @B11
    .word __28_2E_22_29  ; (.")
    .byte 4
    .stringmap russian,"LIT "
@@ -217,17 +203,18 @@ NFA "DISFORT2"
    .word __40           ; @
    .word __3FNAME2      ; ?NAME2
    .word _2_2B          ; 2+
-   .word _BRANCH,@B11    ; BRANCH @B11
-@B10:
-; BRANCH @3F06
-; @3EFE:
+   .word _BRANCH,@B12    ; BRANCH @B12
+@B11:
    .word _DUP           ; DUP
    .word __40           ; @
    .word __3FNAME2      ; ?NAME2
    .word _2_2B          ; 2+
-   .word _BRANCH,@B12    ; BRANCH @B12
-@B11:
-; @3F06:
+@B12:
+@B10:
+@B8:
+@B6:
+@B4:
+   .word _BRANCH,@B3    ; BRANCH @B3
 ; BRANCH @3E65
 ; @3F0A:
    .word __28_2E_22_29  ; (.")
@@ -236,9 +223,8 @@ NFA "DISFORT2"
    .word _CR            ; CR
    .word _DROP          ; DROP
    .word _BRANCH,@B13    ; BRANCH @B13
-@B12:
-; BRANCH @3F7C
-; @3F16:
+@B2:
+; BRANCH @3F7C \ @3F16:
    .word _R_3E          ; R>
    .word __3FNAME2      ; ?NAME2
    .word _DUP           ; DUP
@@ -251,10 +237,8 @@ NFA "DISFORT2"
    .stringmap russian,"- ПEPEMEHHAЯ "
    .word _BRANCH,@B15    ; BRANCH @B15
 @B14:
-; BRANCH @3F7C
-; @3F38:
-   .word _LIT           ; LIT
-   .word __40           ; @
+; BRANCH @3F7C \ @3F38:
+   .word _LIT,__40      ; [COMPILE] @
    .word __3D           ; =
    .word __3FBRANCH,@B16 ; ?BRANCH @B16
 ; ?BRANCH @3F56
@@ -263,8 +247,7 @@ NFA "DISFORT2"
    .stringmap russian,"- KOHCTAHTA  "
    .word _BRANCH,@B17    ; BRANCH @B17
 @B16:
-; BRANCH @3F7C
-; @3F56:
+; BRANCH @3F7C \ @3F56:
    .word __28_2E_22_29  ; (.")
    .byte 35
    .stringmap russian,"- OПPEДEЛEHИE ЧEPEЗ CREATE - DOES> "
