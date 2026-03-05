@@ -44,8 +44,6 @@
 .def _L_3ENAME f_L_3ENAME
 .def __3EPRT f__3EPRT
 .def _PTYPE f_PTYPE
-.def _EMIT f_EMIT
-.def _KEY f_KEY
 .def _HEX f_HEX
 .def _DECIMAL f_DECIMAL
 .def _BLANK f_BLANK

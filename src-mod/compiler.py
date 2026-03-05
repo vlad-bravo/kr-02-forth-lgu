@@ -193,7 +193,7 @@ class Context:
             'LITERAL', 'DLITERAL', 'DOES>', ';', ':', '[', 'NEW', 'JOIN', '(', 'SCRATCH',
             '[COMPILE]', '[\']', 'ABORT"', 'C"', '."', '"', '.(', 'IF', 'IFNOT',
             'ELSE', 'THEN', 'BEGIN', 'AGAIN', 'DO', '?DO', 'LOOP', '+LOOP',
-            'UNTIL', 'WHILE', 'REPEAT',
+            'UNTIL', 'WHILE', 'REPEAT', '--',
         )
         int_name = filtr_string(name)[1:]
         if int_name == name and not is_immediate:

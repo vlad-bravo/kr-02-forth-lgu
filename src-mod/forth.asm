@@ -1213,12 +1213,12 @@ l44fa:
    mvi h,00        ; #4506 26 00
    ret             ; #4508 c9
 
-NFA2 "(KEY)", "_28KEY_29"
+NFA "KEY"
    call l44fa      ; #4529 cd fa 44
    push h          ; #452c e5
    jmp _FNEXT      ; #452d c3 9a 21
 
-NFA2 "(EMIT)", "_28EMIT_29"
+NFA "EMIT"
    pop h
    push b          ; #453a c5
    mov c,l         ; #453b 4d

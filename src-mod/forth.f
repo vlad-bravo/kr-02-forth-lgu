@@ -194,14 +194,6 @@
   DROP
 ;
 
-: EMIT
-  l600e @ EXECUTE >OUT 1+!
-;
-
-: KEY
-  l600c @ EXECUTE
-;
-
 : HEX
   10 BASE !
 ;
@@ -270,6 +262,4 @@
   [COMPILE] QUERY INLINP !
   #TIB 0!
   >IN 0!
-  [COMPILE] (KEY) l600c !
-  [COMPILE] (EMIT) l600e !
 ;

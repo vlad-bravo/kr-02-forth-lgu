@@ -471,22 +471,6 @@ NFA "PTYPE"
    .word _DROP          ; DROP
    .word _EXIT          ; EXIT
 
-NFA "EMIT"
-   call _FCALL
-   .word _LIT,l600e     ; l600e
-   .word __40           ; @
-   .word _EXECUTE       ; EXECUTE
-   .word __3EOUT        ; >OUT
-   .word _1_2B_21       ; 1+!
-   .word _EXIT          ; EXIT
-
-NFA "KEY"
-   call _FCALL
-   .word _LIT,l600c     ; l600c
-   .word __40           ; @
-   .word _EXECUTE       ; EXECUTE
-   .word _EXIT          ; EXIT
-
 NFA "HEX"
    call _FCALL
    .word _LIT,0x10      ; 10
@@ -650,12 +634,6 @@ NFA "STANDIO"
    .word _0_21          ; 0!
    .word __3EIN         ; >IN
    .word _0_21          ; 0!
-   .word _LIT,__28KEY_29; [COMPILE] (KEY)
-   .word _LIT,l600c     ; l600c
-   .word __21           ; !
-   .word _LIT,__28EMIT_29; [COMPILE] (EMIT)
-   .word _LIT,l600e     ; l600e
-   .word __21           ; !
    .word _EXIT          ; EXIT
 
 .ENDS

@@ -1,0 +1,6 @@
+.def _DUMP2 u_DUMP2
+.def _NLIST2 u_NLIST2
+.def _VLIST2 u_VLIST2
+.def __2D_2D2 u__2D_2D2
+.def _DISFORT2 u_DISFORT2
+.def __3FNAME2 u__3FNAME2

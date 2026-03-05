@@ -109,12 +109,12 @@ NFA "SIZE"
    call __40
    .word 0x0924  ; 1e lines * 4e cols = 924
 
-; Ширина (32 символа)
+; Ширина
 NFA "WIDTH"
    call __40
    .word 0x4e  ; 4e = 78 cols
 
-; Высота (26 строк)
+; Высота
 NFA "HEIGHT"
    call __40
    .word 0x1e  ; 1e = 30 lines
@@ -129,18 +129,22 @@ NFA "DEAD"
    call __40
    .word 0x20  ; 20 = ' '
 
+; Список зарождающихся ячеек
 NFA "SLIVE"
    call __40
    .word 0x5000
 
+; Список умирающих ячеек
 NFA "SDEAD"
    call __40
    .word 0x5800
 
+; Указатель в списке зарождающихся ячеек
 NFA "PLIVE"
    call __40
    .word 0x5ff2
 
+; Указатель в списке умирающих ячеек
 NFA "PDEAD"
    call __40
    .word 0x5ff4
