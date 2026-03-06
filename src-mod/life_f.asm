@@ -378,34 +378,6 @@ NFA "HH"
    .word _TYPE          ; TYPE
    .word _EXIT          ; EXIT
 
-NFA "PROMPT2"
-   call _FCALL
-; ( -- )
-; Режим трансляции
-   .word _STATE         ; STATE
-   .word __40           ; @
-   .word __3FBRANCH,@B1 ; ?BRANCH @B1
-   .word _LIT, 0x43     ; C" C
-   .word _BRANCH,@B2    ; BRANCH @B2
-@B1:
-   .word _LIT, 0x49     ; C" I
-@B2:
-   .word _EMIT          ; EMIT
-; Система счисления
-   .word _BASE          ; BASE
-   .word __40           ; @
-   .word _DUP           ; DUP
-   .word _DECIMAL       ; DECIMAL
-   .word _2             ; 2
-   .word __2ER          ; .R
-   .word _BASE          ; BASE
-   .word __21           ; !
-; Галочка и пробел
-   .word _LIT, 0x3e     ; C" >
-   .word _EMIT          ; EMIT
-   .word _SPACE         ; SPACE
-   .word _EXIT          ; EXIT
-
 ; division, floored
 ;     Integer division in which the remainder carries  the  sign  of
 ;     the  divisor  or  is zero,  and the quotient is rounded to its

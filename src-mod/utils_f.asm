@@ -100,7 +100,7 @@ NFA "VLIST2"
    .word _NLIST2        ; NLIST2
    .word _EXIT          ; EXIT
 
-NFA2 "--2", "_2D_2D2"
+NFA2 "--", "_2D_2D", IMMEDIATE
    call _FCALL
    .word __23TIB        ; #TIB
    .word __40           ; @

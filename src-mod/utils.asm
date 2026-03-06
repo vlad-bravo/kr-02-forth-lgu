@@ -122,14 +122,6 @@ NFA "VLIST"
    call _FCALL            ; 3BFD
    .word _CONTEXT, __40, _NLIST, _EXIT
 
-NFA2 "--", "_2D_2D", IMMEDIATE
-   call _FCALL            ; 3C0D
-   .word __23TIB          ; #3c10 2148 - #TIB
-   .word __40             ; #3c12 2820 - @
-   .word __3EIN           ; #3c14 2153 - >IN
-   .word __21             ; #3c16 2839 - !
-   .word _EXIT            ; #3c18 21A8 - EXIT
-
 NFA "DISFORT"
    call _FCALL            ; 3E0E
    .word _CR              ; #3e11 454C - CR

@@ -61,3 +61,6 @@ def action_bracket(context, word):
 
 def action_lit_const(context, word):
     return 'lit_const', word.name
+
+def action_immdiate(context, word):
+    return 'immediate', None

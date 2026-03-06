@@ -82,6 +82,15 @@ class Context:
         self.state = 'interpret'
         self.label_count = 0
         self.label_stack = []
+        self.last_name = ''
+        self.new_immediate_names = False
+        self.new_immediate_list = []
+        self.immediate_names = [
+            'LITERAL', 'DLITERAL', 'DOES>', ';', ':', '[', 'NEW', 'JOIN', '(', 'SCRATCH',
+            '[COMPILE]', '[\']', 'ABORT"', 'C"', '."', '"', '.(', 'IF', 'IFNOT',
+            'ELSE', 'THEN', 'BEGIN', 'AGAIN', 'DO', '?DO', 'LOOP', '+LOOP',
+            'UNTIL', '--',
+        ]
 
     def interpret(self, word):
         forth_word = find_word(word)
@@ -184,17 +193,18 @@ class Context:
             result = f"   .word __3FBRANCH,@B{label} ; ?BRANCH @B{label}"
         elif type == 'lit_const':
             result = f"   .word _LIT,{text:<10}; {text}"
+        elif type == 'immediate':
+            if self.last_name not in self.immediate_names:
+                self.new_immediate_names = True
+                self.immediate_names.append(self.last_name)
+                self.new_immediate_list.append(self.last_name)
+            result = None
         else:
             result = self.write_default(text)
         return result
 
     def create_nfa(self, name):
-        is_immediate = name in (
-            'LITERAL', 'DLITERAL', 'DOES>', ';', ':', '[', 'NEW', 'JOIN', '(', 'SCRATCH',
-            '[COMPILE]', '[\']', 'ABORT"', 'C"', '."', '"', '.(', 'IF', 'IFNOT',
-            'ELSE', 'THEN', 'BEGIN', 'AGAIN', 'DO', '?DO', 'LOOP', '+LOOP',
-            'UNTIL', 'WHILE', 'REPEAT', '--',
-        )
+        is_immediate = name in self.immediate_names
         int_name = filtr_string(name)[1:]
         if int_name == name and not is_immediate:
             result = f"NFA \"{name}\"\n   call _FCALL"
@@ -210,6 +220,7 @@ class Context:
         self.label_count = 0
         if self.is_prefix:
             self.prefix_defs.append(f".def _{int_name} {self.prefix}_{int_name}\n")
+        self.last_name = name
         return result
 
     def write_word(self, name):
@@ -258,7 +269,8 @@ def process_file(filename: str, prefix: str):
             if word:
                 int_word = context.interpret(word)
                 out_text = context.translate(*int_word)
-                f.write(out_text + '\n')
+                if out_text:
+                    f.write(out_text + '\n')
             else:
                 break
 
@@ -268,6 +280,9 @@ def process_file(filename: str, prefix: str):
         with open(f"{filename}_defs.inc", 'w', encoding='utf-8') as f:
             for line in context.prefix_defs:
                 f.write(line)
+
+    if context.new_immediate_names:
+        print(filename, context.new_immediate_list)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Транслятор FORTH')

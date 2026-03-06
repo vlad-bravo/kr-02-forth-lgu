@@ -20,6 +20,7 @@ from actions import (
     action_repeat,
     action_until,
     action_lit_const,
+    action_immdiate,
 )
 
 class Word:
@@ -49,6 +50,7 @@ WORDS = (
     Word('AGAIN', action_again),
     Word('REPEAT', action_repeat),
     Word('UNTIL', action_until),
+    Word('IMMEDIATE', action_immdiate),
     Word('-1'),
     Word('0'),
     Word('1'),

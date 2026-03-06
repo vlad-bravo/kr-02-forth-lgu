@@ -29,9 +29,9 @@
   CONTEXT @ NLIST2
 ;
 
-: --2
+: --
   #TIB @ >IN !
-;
+; IMMEDIATE
 
 : DISFORT2
   CR >R R@ C@ CD <>
