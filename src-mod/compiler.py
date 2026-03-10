@@ -137,6 +137,9 @@ class Context:
         elif type == '[comp]':
             int_name = filtr_string(text)
             result = f"   .word _LIT,{int_name:<10}; [COMPILE] {text}"
+        elif type == 'comp':
+            int_name = filtr_string(text)
+            result = f"   .word {int_name:<15}; COMPILE {text}"
         elif type == 'if':
             self.label_count += 1
             self.label_stack.append(self.label_count)

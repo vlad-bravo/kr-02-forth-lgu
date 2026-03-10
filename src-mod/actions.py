@@ -23,6 +23,9 @@ def action_cquot(context, word):
 def action_b_comp(context, word):
     return '[comp]', context.splitter.следующий(' ')
 
+def action_comp(context, word):
+    return 'comp', context.splitter.следующий(' ')
+
 def action_if(context, word):
     return 'if', None
 
