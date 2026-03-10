@@ -105,7 +105,7 @@ class Context:
 
     def translate (self, type, text):
         if type == '\\':
-            result = '; ' + text
+            result = ';\ ' + text
         elif type == '(':
             result = f"; ( {text})"
         elif type == '+':
