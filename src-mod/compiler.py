@@ -89,7 +89,7 @@ class Context:
             'LITERAL', 'DLITERAL', 'DOES>', ';', ':', '[', 'NEW', 'JOIN', '(', 'SCRATCH',
             '[COMPILE]', '[\']', 'ABORT"', 'C"', '."', '"', '.(', 'IF', 'IFNOT',
             'ELSE', 'THEN', 'BEGIN', 'AGAIN', 'DO', '?DO', 'LOOP', '+LOOP',
-            'UNTIL', '--',
+            'UNTIL', '--', 'WHILE', 'REPEAT',
         ]
 
     def interpret(self, word):

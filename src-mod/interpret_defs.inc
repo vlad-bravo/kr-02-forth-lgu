@@ -51,4 +51,6 @@
 .def _LOOP i_LOOP
 .def __2BLOOP i__2BLOOP
 .def _UNTIL i_UNTIL
+.def _WHILE i_WHILE
+.def _REPEAT i_REPEAT
 .def _STRING i_STRING

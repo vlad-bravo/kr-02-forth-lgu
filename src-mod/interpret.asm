@@ -43,28 +43,6 @@ NFA2 "S.", "S_2E"
 @3C56:
    .word _EXIT            ; #3c56 21A8 - EXIT
 
-NFA2 "WHILE" ,"WHILE", IMMEDIATE
-   call _FCALL            ; 3AFB
-   .word __3FCOMP         ; #3afe 3862 - ?COMP
-   .word _1               ; #3b00 2B34 - 1
-   .word __3FPAIRS        ; #3b02 3893 - ?PAIRS
-   .word _1               ; #3b04 2B34 - 1
-   .word _IF              ; #3b06 39EC - IF
-   .word _2_2B            ; #3b08 2325 - 2+
-   .word _EXIT            ; #3b0a 21A8 - EXIT
-
-NFA2 "REPEAT", "REPEAT", IMMEDIATE
-   call _FCALL            ; 3B15
-   .word __3FCOMP         ; #3b18 3862 - ?COMP
-   .word __3ER            ; #3b1a 27A9 - >R
-   .word __3ER            ; #3b1c 27A9 - >R
-   .word _AGAIN           ; #3b1e 3A5F - AGAIN
-   .word _R_3E            ; #3b20 27BC - R>
-   .word _R_3E            ; #3b22 27BC - R>
-   .word _2_2D            ; #3b24 233C - 2-
-   .word _THEN            ; #3b26 3A37 - THEN
-   .word _EXIT            ; #3b28 21A8 - EXIT
-
 NFA "FORGET"
    call _FCALL            ; 3D10
    .word _BL              ; #3d13 3289 - BL
