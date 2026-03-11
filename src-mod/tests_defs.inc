@@ -1,0 +1,3 @@
+.def _HH t_HH
+.def _STD_2DTEST1 t_STD_2DTEST1
+.def _TESTS t_TESTS

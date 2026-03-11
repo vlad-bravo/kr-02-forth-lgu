@@ -11,7 +11,7 @@
 .DEF PREV_NFA PREV_NFA_MATH_F
 .DEF PREFIX PREFIX_MATH_F
 
-; Математика
+;\ Математика
 NFA2 "S>D", "S_3ED"
    call _FCALL
    .word _DUP           ; DUP

@@ -11,7 +11,7 @@
 .DEF PREV_NFA PREV_NFA_FORTH_F
 .DEF PREFIX PREFIX_FORTH_F
 
-; Слова FORTH написанные на FORTH
+;\ Слова FORTH написанные на FORTH
 NFA "HERE"
    call _FCALL
    .word _H             ; H

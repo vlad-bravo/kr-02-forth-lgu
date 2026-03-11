@@ -11,7 +11,7 @@
 .DEF PREV_NFA PREV_NFA_UTILS_F
 .DEF PREFIX PREFIX_UTILS_F
 
-; Утилиты
+;\ Утилиты
 NFA "DUMP2"
    call _FCALL
    .word _BASE          ; BASE
@@ -88,7 +88,7 @@ NFA "NLIST2"
    .word _TYPE          ; TYPE
    .word _SPACES        ; SPACES
    .word _N_3ELINK      ; N>LINK
-; >OUT @ 63 U< IFNOT CR THEN
+;\ >OUT @ 63 U< IFNOT CR THEN
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _DROP          ; DROP
    .word _EXIT          ; EXIT
@@ -131,7 +131,7 @@ NFA "DISFORT2"
    .word _CALL          ; CALL
    .word __3D           ; =
    .word __3FBRANCH,@B2 ; ?BRANCH @B2
-; ?BRANCH @3F16
+;\ ?BRANCH @3F16
    .word __28_2E_22_29  ; (.")
    .byte 2
    .stringmap russian,": "
@@ -142,13 +142,13 @@ NFA "DISFORT2"
    .word _CFL           ; CFL
    .word __2B           ; +
 @B3:
-; @3E65:
+;\ @3E65:
    .word _DUP           ; DUP
    .word __40           ; @
    .word _LIT,_EXIT     ; [COMPILE] EXIT
    .word __3C_3E        ; <>
    .word __3FBRANCH,@B4 ; ?BRANCH @B4
-; ?BRANCH @3F0A
+;\ ?BRANCH @3F0A
    .word _DUP           ; DUP
    .word _DUP           ; DUP
    .word __40           ; @
@@ -215,8 +215,8 @@ NFA "DISFORT2"
 @B6:
 @B4:
    .word _BRANCH,@B3    ; BRANCH @B3
-; BRANCH @3E65
-; @3F0A:
+;\ BRANCH @3E65
+;\ @3F0A:
    .word __28_2E_22_29  ; (.")
    .byte 1
    .stringmap russian,";"
@@ -224,34 +224,34 @@ NFA "DISFORT2"
    .word _DROP          ; DROP
    .word _BRANCH,@B13    ; BRANCH @B13
 @B2:
-; BRANCH @3F7C \ @3F16:
+;\ BRANCH @3F7C \ @3F16:
    .word _R_3E          ; R>
    .word __3FNAME2      ; ?NAME2
    .word _DUP           ; DUP
    .word _NEXT          ; NEXT
    .word __3D           ; =
    .word __3FBRANCH,@B14 ; ?BRANCH @B14
-; ?BRANCH @3F38
+;\ ?BRANCH @3F38
    .word __28_2E_22_29  ; (.")
    .byte 13
    .stringmap russian,"- ПEPEMEHHAЯ "
    .word _BRANCH,@B15    ; BRANCH @B15
 @B14:
-; BRANCH @3F7C \ @3F38:
+;\ BRANCH @3F7C \ @3F38:
    .word _LIT,__40      ; [COMPILE] @
    .word __3D           ; =
    .word __3FBRANCH,@B16 ; ?BRANCH @B16
-; ?BRANCH @3F56
+;\ ?BRANCH @3F56
    .word __28_2E_22_29  ; (.")
    .byte 13
    .stringmap russian,"- KOHCTAHTA  "
    .word _BRANCH,@B17    ; BRANCH @B17
 @B16:
-; BRANCH @3F7C \ @3F56:
+;\ BRANCH @3F7C \ @3F56:
    .word __28_2E_22_29  ; (.")
    .byte 35
    .stringmap russian,"- OПPEДEЛEHИE ЧEPEЗ CREATE - DOES> "
-; @3F7C:
+;\ @3F7C:
 @B17:
 @B15:
 @B13:

@@ -2,6 +2,7 @@
 .include "forth_defs.inc"
 .include "interpret_defs.inc"
 .include "math_defs.inc"
+.include "tests_defs.inc"
 .include "utils_defs.inc"
 
 ; From var.asm

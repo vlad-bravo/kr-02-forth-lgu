@@ -11,20 +11,20 @@
 .DEF PREV_NFA PREV_NFA_LIFE_F
 .DEF PREFIX PREFIX_LIFE_F
 
-; Определение слов для последующей компиляции
+;\ Определение слов для последующей компиляции
 NFA "FLD"
    call _FCALL
 ; ( -- )
-; Перебор всех ячеек экрана
-;    HEIGHT 0 DO
-;        WIDTH 0 DO
-;            C" . J WIDTH * I + VIDMEM + C!
-;        LOOP
-;    LOOP
-; Перебор ячеек экрана по типам
-; A, B, C, D - по углам экрана
-; T, L, R, B - верхняя, левая, правая, нижняя границы
-; . - все внутренние ячейки
+;\ Перебор всех ячеек экрана
+;\    HEIGHT 0 DO
+;\        WIDTH 0 DO
+;\            C" . J WIDTH * I + VIDMEM + C!
+;\        LOOP
+;\    LOOP
+;\ Перебор ячеек экрана по типам
+;\ A, B, C, D - по углам экрана
+;\ T, L, R, B - верхняя, левая, правая, нижняя границы
+;\ . - все внутренние ячейки
    .word _VIDMEM        ; VIDMEM
    .word _LIT, 0x41     ; C" A
    .word _OVER          ; OVER
@@ -96,13 +96,13 @@ NFA "FLD"
 NFA "INIT"
    call _FCALL
 ; ( -- )
-; Заполняем пробелами
+;\ Заполняем пробелами
    .word _VIDMEM        ; VIDMEM
    .word _SIZE          ; SIZE
    .word _DEAD          ; DEAD
    .word _FILL          ; FILL
-; Рисуем планер (Glider) в центре экрана
-; Координаты примерно (10, 10)
+;\ Рисуем планер (Glider) в центре экрана
+;\ Координаты примерно (10, 10)
    .word _LIVE          ; LIVE
    .word _DUP           ; DUP
    .word _LIT,0xA       ; A
@@ -113,7 +113,7 @@ NFA "INIT"
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (10, 10)
+;\ (10, 10)
    .word _DUP           ; DUP
    .word _LIT,0xB       ; B
    .word _LIT,0xA       ; A
@@ -123,7 +123,7 @@ NFA "INIT"
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 10)
+;\ (11, 10)
    .word _DUP           ; DUP
    .word _LIT,0xC       ; C
    .word _LIT,0xA       ; A
@@ -133,7 +133,7 @@ NFA "INIT"
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 10)
+;\ (12, 10)
    .word _DUP           ; DUP
    .word _LIT,0xC       ; C
    .word _LIT,0x9       ; 9
@@ -143,7 +143,7 @@ NFA "INIT"
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (12, 9)
+;\ (12, 9)
    .word _DUP           ; DUP
    .word _LIT,0xB       ; B
    .word _LIT,0x8       ; 8
@@ -153,7 +153,7 @@ NFA "INIT"
    .word _VIDMEM        ; VIDMEM
    .word __2B           ; +
    .word _C_21          ; C!
-; (11, 8)
+;\ (11, 8)
    .word _DUP           ; DUP
    .word _LIT,0x1A      ; 1A
    .word _LIT,0xB       ; B
@@ -247,8 +247,8 @@ NFA "INIT"
    .word _DROP          ; DROP
    .word _EXIT          ; EXIT
 
-; Анализ состояния ячейки
-; Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
+;\ Анализ состояния ячейки
+;\ Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
 NFA2 "PR-CELL", "PR_2DCELL"
    call _FCALL
 ; ( A -- )
@@ -262,7 +262,7 @@ NFA2 "PR-CELL", "PR_2DCELL"
    .word __3D           ; =
 ; ( A N IsLive )
    .word __3FBRANCH,@B1 ; ?BRANCH @B1
-; Клетка жива
+;\ Клетка жива
    .word _DUP           ; DUP
    .word _2             ; 2
    .word __3D           ; =
@@ -285,7 +285,7 @@ NFA2 "PR-CELL", "PR_2DCELL"
 @B3:
    .word _BRANCH,@B4    ; BRANCH @B4
 @B1:
-; Клетка мертва
+;\ Клетка мертва
    .word _LIT,0x3       ; 3
    .word __3D           ; =
    .word __3FBRANCH,@B5 ; ?BRANCH @B5
@@ -308,20 +308,20 @@ NFA "LIFE"
    call _FCALL
 ; ( -- )
    .word _INIT          ; INIT
-; Первая ячейка поля - во второй строке, второй колонке
+;\ Первая ячейка поля - во второй строке, второй колонке
    .word _VIDMEM        ; VIDMEM
    .word _WIDTH         ; WIDTH
    .word __2B           ; +
    .word _1_2B          ; 1+
 @B1:
-; Указатели на массивы зарождающихся и умирающих ячеек
+;\ Указатели на массивы зарождающихся и умирающих ячеек
    .word _SLIVE         ; SLIVE
    .word _PLIVE         ; PLIVE
    .word __21           ; !
    .word _SDEAD         ; SDEAD
    .word _PDEAD         ; PDEAD
    .word __21           ; !
-; Обработка поля кроме крайних строк и колонок
+;\ Обработка поля кроме крайних строк и колонок
    .word _DUP           ; DUP
    .word _HEIGHT        ; HEIGHT
    .word _2             ; 2
@@ -337,11 +337,11 @@ NFA "LIFE"
    .word __28LOOP_29,@B4 ; (LOOP) @B4
 @B5:
    .word _2_2B          ; 2+
-; Пропуск последней ячейки текущей строки и первой ячейки следующей строки
+;\ Пропуск последней ячейки текущей строки и первой ячейки следующей строки
    .word __28LOOP_29,@B2 ; (LOOP) @B2
 @B3:
    .word _DROP          ; DROP
-; Отображение подготовленных данных о рождённых и умерших ячейках
+;\ Отображение подготовленных данных о рождённых и умерших ячейках
    .word _PLIVE         ; PLIVE
    .word __40           ; @
    .word _SLIVE         ; SLIVE
@@ -369,40 +369,7 @@ NFA "LIFE"
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 
-NFA "HH"
-   call _FCALL
-   .word __28_22_29     ; (")
-   .byte 12
-   .stringmap russian,"HELLO, HABR!"
-   .word _COUNT         ; COUNT
-   .word _TYPE          ; TYPE
-   .word _EXIT          ; EXIT
-
-; division, floored
-;     Integer division in which the remainder carries  the  sign  of
-;     the  divisor  or  is zero,  and the quotient is rounded to its
-;     arithmetic floor.  Note that,  except for error conditions, n1
-;     n2  SWAP  OVER /MOD ROT * + is identical to n1.  See:  "floor,
-;     arithmetic" Examples:
-;          dividend  divisor  remainder  quotient
-;            10        7        3          1
-;           -10        7        4         -2
-;            10       -7       -4         -2
-;           -10       -7       -3          1
-NFA2 "STD-TEST1", "STD_2DTEST1"
-   call _FCALL
-   .word _LIT,0x100     ; 100
-   .word _LIT,0x17      ; 17
-   .word _SWAP          ; SWAP
-   .word _OVER          ; OVER
-   .word __2FMOD        ; /MOD
-   .word _ROT           ; ROT
-   .word __2A           ; *
-   .word __2B           ; +
-   .word __2E           ; .
-   .word _EXIT          ; EXIT
-
-; Всегда последнее слово (для правильной цепочки NFA)
+;\ Всегда последнее слово (для правильной цепочки NFA)
 NFA "BYE"
    call _FCALL
    .word _LIT,0xF800    ; F800
