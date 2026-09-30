@@ -23,6 +23,6 @@ C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o utils.o utils.asm
 C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o utils_f.o utils_f.asm
 C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o var.o var.asm
 
-C:\dev\wla_dx_v10.6_Win64\wlalink.exe -r link_mod.cfg forth_mod.bin
+C:\dev\wla_dx_v10.6_Win64\wlalink.exe link_mod.cfg forth_mod.bin
 
 del *.o 2>nul
