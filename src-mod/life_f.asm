@@ -93,160 +93,6 @@ NFA "FLD"
    .word _C_21          ; C!
    .word _EXIT          ; EXIT
 
-NFA "INIT"
-   call _FCALL
-; ( -- )
-;\ Заполняем пробелами
-   .word _VIDMEM        ; VIDMEM
-   .word _SIZE          ; SIZE
-   .word _DEAD          ; DEAD
-   .word _FILL          ; FILL
-;\ Рисуем планер (Glider) в центре экрана
-;\ Координаты примерно (10, 10)
-   .word _LIVE          ; LIVE
-   .word _DUP           ; DUP
-   .word _LIT,0xA       ; A
-   .word _LIT,0xA       ; A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-;\ (10, 10)
-   .word _DUP           ; DUP
-   .word _LIT,0xB       ; B
-   .word _LIT,0xA       ; A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-;\ (11, 10)
-   .word _DUP           ; DUP
-   .word _LIT,0xC       ; C
-   .word _LIT,0xA       ; A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-;\ (12, 10)
-   .word _DUP           ; DUP
-   .word _LIT,0xC       ; C
-   .word _LIT,0x9       ; 9
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-;\ (12, 9)
-   .word _DUP           ; DUP
-   .word _LIT,0xB       ; B
-   .word _LIT,0x8       ; 8
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-;\ (11, 8)
-   .word _DUP           ; DUP
-   .word _LIT,0x1A      ; 1A
-   .word _LIT,0xB       ; B
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0x1B      ; 1B
-   .word _LIT,0xB       ; B
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0x1C      ; 1C
-   .word _LIT,0xB       ; B
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0x1A      ; 1A
-   .word _LIT,0xA       ; A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0x1B      ; 1B
-   .word _LIT,0x9       ; 9
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0xA       ; A
-   .word _LIT,0x1A      ; 1A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0xB       ; B
-   .word _LIT,0x1A      ; 1A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0xC       ; C
-   .word _LIT,0x1A      ; 1A
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0xC       ; C
-   .word _LIT,0x19      ; 19
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DUP           ; DUP
-   .word _LIT,0xB       ; B
-   .word _LIT,0x18      ; 18
-   .word _WIDTH         ; WIDTH
-   .word __2A           ; *
-   .word __2B           ; +
-   .word _VIDMEM        ; VIDMEM
-   .word __2B           ; +
-   .word _C_21          ; C!
-   .word _DROP          ; DROP
-   .word _EXIT          ; EXIT
-
 ;\ Анализ состояния ячейки
 ;\ Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
 NFA2 "PR-CELL", "PR_2DCELL"
@@ -276,11 +122,10 @@ NFA2 "PR-CELL", "PR_2DCELL"
 @B2:
    .word _PDEAD         ; PDEAD
    .word __40           ; @
-   .word __21           ; !
-   .word _PDEAD         ; PDEAD
-   .word __40           ; @
+   .word _DUP           ; DUP
    .word _2_2B          ; 2+
    .word _PDEAD         ; PDEAD
+   .word __21           ; !
    .word __21           ; !
 @B3:
    .word _BRANCH,@B4    ; BRANCH @B4
@@ -291,11 +136,10 @@ NFA2 "PR-CELL", "PR_2DCELL"
    .word __3FBRANCH,@B5 ; ?BRANCH @B5
    .word _PLIVE         ; PLIVE
    .word __40           ; @
-   .word __21           ; !
-   .word _PLIVE         ; PLIVE
-   .word __40           ; @
+   .word _DUP           ; DUP
    .word _2_2B          ; 2+
    .word _PLIVE         ; PLIVE
+   .word __21           ; !
    .word __21           ; !
    .word _BRANCH,@B6    ; BRANCH @B6
 @B5:
@@ -307,7 +151,14 @@ NFA2 "PR-CELL", "PR_2DCELL"
 NFA "LIFE"
    call _FCALL
 ; ( -- )
-   .word _INIT          ; INIT
+;\ Заполняем пробелами
+   .word _VIDMEM        ; VIDMEM
+   .word _SIZE          ; SIZE
+   .word _DEAD          ; DEAD
+   .word _FILL          ; FILL
+;\ Начальная сцена
+   .word _INIT_2DSTAGE  ; INIT-STAGE
+;\ 0 1 DO 355 113 / DROP LOOP
 ;\ Первая ячейка поля - во второй строке, второй колонке
    .word _VIDMEM        ; VIDMEM
    .word _WIDTH         ; WIDTH
@@ -342,6 +193,9 @@ NFA "LIFE"
 @B3:
    .word _DROP          ; DROP
 ;\ Отображение подготовленных данных о рождённых и умерших ячейках
+;\ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
+;\ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+;\ 500 0 DO 355 113 / DROP LOOP
    .word _PLIVE         ; PLIVE
    .word __40           ; @
    .word _SLIVE         ; SLIVE

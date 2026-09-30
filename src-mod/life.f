@@ -40,34 +40,6 @@
   C" D SWAP C!
 ;
 
-: INIT ( -- )
-  \ Заполняем пробелами
-  VIDMEM SIZE DEAD FILL
-    
-  \ Рисуем планер (Glider) в центре экрана
-  \ Координаты примерно (10, 10)
-  LIVE
-  DUP A A WIDTH * + VIDMEM + C! \ (10, 10)
-  DUP B A WIDTH * + VIDMEM + C! \ (11, 10)
-  DUP C A WIDTH * + VIDMEM + C! \ (12, 10)
-  DUP C 9 WIDTH * + VIDMEM + C! \ (12, 9)
-  DUP B 8 WIDTH * + VIDMEM + C! \ (11, 8)
-
-  DUP 1A B WIDTH * + VIDMEM + C!
-  DUP 1B B WIDTH * + VIDMEM + C!
-  DUP 1C B WIDTH * + VIDMEM + C!
-  DUP 1A A WIDTH * + VIDMEM + C!
-  DUP 1B 9 WIDTH * + VIDMEM + C!
-
-  DUP A 1A WIDTH * + VIDMEM + C!
-  DUP B 1A WIDTH * + VIDMEM + C!
-  DUP C 1A WIDTH * + VIDMEM + C!
-  DUP C 19 WIDTH * + VIDMEM + C!
-  DUP B 18 WIDTH * + VIDMEM + C!
-
-  DROP
-;
-
 \ Анализ состояния ячейки
 \ Добавление адреса ячейки в массивы зарождающихся или умирающих ячеек
 : PR-CELL ( A -- )
@@ -77,14 +49,18 @@
     
   IF       \ Клетка жива
     DUP 2 = SWAP 3 = OR
-    IF DROP ELSE PDEAD @ ! PDEAD @ 2+ PDEAD ! THEN
+    IF DROP ELSE PDEAD @ DUP 2+ PDEAD ! ! THEN
   ELSE     \ Клетка мертва
-    3 = IF PLIVE @ ! PLIVE @ 2+ PLIVE ! ELSE DROP THEN
+    3 = IF PLIVE @ DUP 2+ PLIVE ! ! ELSE DROP THEN
   THEN
 ;
 
 : LIFE ( -- )
-  INIT
+  \ Заполняем пробелами
+  VIDMEM SIZE DEAD FILL
+  \ Начальная сцена
+  INIT-STAGE
+  \ 0 1 DO 355 113 / DROP LOOP
   \ Первая ячейка поля - во второй строке, второй колонке
   VIDMEM WIDTH + 1+
   BEGIN
@@ -103,6 +79,9 @@
     DROP
 
     \ Отображение подготовленных данных о рождённых и умерших ячейках
+    \ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
+    \ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+    \ 500 0 DO 355 113 / DROP LOOP
     PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
     PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
   AGAIN
