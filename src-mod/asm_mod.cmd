@@ -10,6 +10,8 @@ python compiler.py math --prefix m
 python compiler.py tests --prefix t
 python compiler.py utils --prefix u
 
+python ascii_to_asm.py stage.ascii life_manual_stage.asm
+
 C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o forth.o forth.asm
 C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o forth_f.o forth_f.asm
 C:\dev\wla_dx_v10.6_Win64\wla-8080.exe -i -o life_f.o life_f.asm
