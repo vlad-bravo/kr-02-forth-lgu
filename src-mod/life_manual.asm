@@ -100,6 +100,10 @@ NFA "COUNTNEIGHBORS"
    jmp _FNEXT
 
 NFA2 "INIT-STAGE", "INIT_2DSTAGE"
+   mvi a,0x80   ; Команда загрузки курсора
+   sta 0xc001   ; Запись команды i8275
+   sta 0xc000   ; Запись колонки
+   sta 0xc000   ; Запись строки
    lxi h,@STAGE_DATA
 @STAGE_LOOP:
    mov e,m
