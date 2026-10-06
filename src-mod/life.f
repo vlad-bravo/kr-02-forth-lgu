@@ -87,5 +87,34 @@
   AGAIN
 ;
 
+: LIFE2 ( -- )
+  \ Заполняем пробелами
+  VIDMEM SIZE DEAD FILL
+  \ Начальная сцена
+  INIT-STAGE
+  \ 0 1 DO 355 113 / DROP LOOP
+  \ Первая ячейка поля - во второй строке, первой колонке
+  VIDMEM WIDTH +
+  BEGIN
+    \ Указатели на массивы зарождающихся и умирающих ячеек
+    SLIVE PLIVE !
+    SDEAD PDEAD !
+
+    \ Обработка поля кроме крайних строк и колонок
+    DUP
+    WIDTH 2 DO
+      DUP PR-COLUMN 1+
+    LOOP
+    DROP
+
+    \ Отображение подготовленных данных о рождённых и умерших ячейках
+    \ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
+    \ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+    \ 500 0 DO 355 113 / DROP LOOP
+    PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
+    PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
+  AGAIN
+;
+
 \ Всегда последнее слово (для правильной цепочки NFA)
 : BYE F800 EXECUTE ;

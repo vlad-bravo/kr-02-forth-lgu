@@ -223,6 +223,72 @@ NFA "LIFE"
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 
+NFA "LIFE2"
+   call _FCALL
+; ( -- )
+;\ Заполняем пробелами
+   .word _VIDMEM        ; VIDMEM
+   .word _SIZE          ; SIZE
+   .word _DEAD          ; DEAD
+   .word _FILL          ; FILL
+;\ Начальная сцена
+   .word _INIT_2DSTAGE  ; INIT-STAGE
+;\ 0 1 DO 355 113 / DROP LOOP
+;\ Первая ячейка поля - во второй строке, первой колонке
+   .word _VIDMEM        ; VIDMEM
+   .word _WIDTH         ; WIDTH
+   .word __2B           ; +
+@B1:
+;\ Указатели на массивы зарождающихся и умирающих ячеек
+   .word _SLIVE         ; SLIVE
+   .word _PLIVE         ; PLIVE
+   .word __21           ; !
+   .word _SDEAD         ; SDEAD
+   .word _PDEAD         ; PDEAD
+   .word __21           ; !
+;\ Обработка поля кроме крайних строк и колонок
+   .word _DUP           ; DUP
+   .word _WIDTH         ; WIDTH
+   .word _2             ; 2
+   .word __28_3FDO_29,@B3 ; (?DO) @B3
+@B2:
+   .word _DUP           ; DUP
+   .word _PR_2DCOLUMN   ; PR-COLUMN
+   .word _1_2B          ; 1+
+   .word __28LOOP_29,@B2 ; (LOOP) @B2
+@B3:
+   .word _DROP          ; DROP
+;\ Отображение подготовленных данных о рождённых и умерших ячейках
+;\ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
+;\ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+;\ 500 0 DO 355 113 / DROP LOOP
+   .word _PLIVE         ; PLIVE
+   .word __40           ; @
+   .word _SLIVE         ; SLIVE
+   .word __28_3FDO_29,@B5 ; (?DO) @B5
+@B4:
+   .word _LIVE          ; LIVE
+   .word _I             ; I
+   .word __40           ; @
+   .word _C_21          ; C!
+   .word _2             ; 2
+   .word __28_2BLOOP_29,@B4 ; (+LOOP) @B4
+@B5:
+   .word _PDEAD         ; PDEAD
+   .word __40           ; @
+   .word _SDEAD         ; SDEAD
+   .word __28_3FDO_29,@B7 ; (?DO) @B7
+@B6:
+   .word _DEAD          ; DEAD
+   .word _I             ; I
+   .word __40           ; @
+   .word _C_21          ; C!
+   .word _2             ; 2
+   .word __28_2BLOOP_29,@B6 ; (+LOOP) @B6
+@B7:
+   .word _BRANCH,@B1    ; BRANCH @B1
+   .word _EXIT          ; EXIT
+
 ;\ Всегда последнее слово (для правильной цепочки NFA)
 NFA "BYE"
    call _FCALL
