@@ -220,6 +220,7 @@ NFA "LIFE"
    .word _2             ; 2
    .word __28_2BLOOP_29,@B8 ; (+LOOP) @B8
 @B9:
+;\ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 
@@ -286,6 +287,7 @@ NFA "LIFE2"
    .word _2             ; 2
    .word __28_2BLOOP_29,@B6 ; (+LOOP) @B6
 @B7:
+;\ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 

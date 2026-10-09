@@ -10,34 +10,9 @@
 .DEF PREV_NFA PREV_NFA_LIFE_MANUAL
 .DEF PREFIX PREFIX_LIFE_MANUAL
 
-; : CHECK-LIVE ( N A -- N' A )
-;   DUP C@ LIVE = IF SWAP 1+ SWAP THEN
-; ;
-
-NFA "CHECKLIVE"
-   pop h    ; A
-   pop d    ; N
-   mov a,m
-   cpi 0x2A ; '*'
-   jnz @skip
-   inx d
-@skip:
-   push d   ; N'
-   push h   ; A
-   jmp _FNEXT
-
-; : COUNT-NEIGHBORS ( A -- N )
-;   0 SWAP           \ N A
-;   WIDTH - CHECKLIVE  \ Верхняя
-;        1- CHECKLIVE  \ Верхняя левая
-;        2+ CHECKLIVE  \ Верхняя правая
-;   WIDTH + CHECKLIVE  \ Правая
-;        2- CHECKLIVE  \ Левая
-;   WIDTH + CHECKLIVE  \ Нижняя левая
-;        1+ CHECKLIVE  \ Нижняя
-;        1+ CHECKLIVE  \ Нижняя правая
-;   DROP
-; ;
+.def PTR_LIVE 0x5ff2 ; Указатель в списке зарождающихся ячеек
+.def PTR_DEAD 0x5ff4 ; Указатель в списке умирающих ячеек
+.def LIVE_CHAR 0x2A  ; '*'
 
 NFA "COUNTNEIGHBORS"
    pop h
@@ -46,52 +21,52 @@ NFA "COUNTNEIGHBORS"
    lxi d,0
    dad b        ; Верхняя
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip1
    inx d
 @skip1:
    dcx h        ; Верхняя правая
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip2
    inx d
 @skip2:
    inx h
    inx h        ; Верхняя правая
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip3
    inx d
 @skip3:
    lxi b,0x4E   ; WIDTH, 0x4e = 78 cols
    dad b        ; Правая
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip4
    inx d
 @skip4:
    dcx h
    dcx h        ; Левая
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip5
    inx d
 @skip5:
    dad b        ; Левая нижняя
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip6
    inx d
 @skip6:
    inx h        ; Нижняя
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip7
    inx d
 @skip7:
    inx h        ; Нижняя правая
    mov a,m
-   cpi 0x2A     ; '*'
+   cpi LIVE_CHAR     ; '*'
    jnz @skip8
    inx d
 @skip8:
@@ -114,7 +89,7 @@ NFA2 "INIT-STAGE", "INIT_2DSTAGE"
    mov d,a
    inx h
    xchg
-   mvi m,0x2A   ; '*'
+   mvi m,LIVE_CHAR   ; '*'
    xchg
    jmp @STAGE_LOOP
 
@@ -140,100 +115,102 @@ NFA2 "PR-COLUMN", "PR_2DCOLUMN"
    push b
 ; B=00000000 C=0
    lxi b,0
-   mvi e,28 ; Количество строк без верхней и нижней
+   mvi e,29 ; Количество строк без верхней
 @COL_LOOP:
+; Выделение количества в верхней тройке
    mov a,b
    ani 0b00000011
    mov d,a
+; Уменьшение общего количества (удаление верхней тройки)
    mov a,c
    sub d
    mov c,a
+; Удаление верхней тройки (сдвиг троек)
    mov a,b
-   cmc
    rrc
-   cmc
    rrc
-   cmc
    rrc
+   ani 0b00011111
    mov b,a
-   mvi a,0x2A   ; '*'
+; Подсчет живых клеток в текущей тройке
+   mvi d,0
+   mvi a,LIVE_CHAR   ; '*'
    cmp m
    inx h
    jnz @SKIP1
-   inr c
+   inr d
 @SKIP1:
-
+; Вторая клетка - в проверяемом столбце, запомнить живая ли она
    cmp m
    inx h
    jnz @SKIP2
-   inr c
+   inr d
    mov a,b
-   adi 0b00100000
+   ori 0b00100000
    mov b,a
-   mvi a,0x2A   ; '*'
+   mvi a,LIVE_CHAR   ; '*'
 @SKIP2:
 
    cmp m
 ;   inx h
    jnz @SKIP3
-   inr c
+   inr d
 @SKIP3:
-
-   mov a,c
-   cmc
-   rlc
-   rlc
-   rlc
-   rlc
-   rlc
-   rlc
-   mov d,a
-   mov a,b
-   add d
+; Добавление к общей сумме
+   mov a,d
+   add c
+   mov c,a
+; Добавление количества в новой тройке
+   mov a,d
+   rrc
+   rrc
+   ora b
    mov b,a
-
+; Проверка статуса в предыдущей тройке
    ani 0b00000100
    mov a,c
    jz @WAS_DEAD
-   cpi 3
+@WAS_LIVE:
+   cpi 3 ; С учётом самой живой клетки
    jz @END_LOOP
-   cpi 4
+   cpi 4 ; С учётом самой живой клетки
    jz @END_LOOP
-   ; Клетка должна умереть
+; Клетка должна умереть
    push d
    push h
    lxi d,-79 ; Смещение от правого нижнего угла до центральной клетки
    dad d
    xchg
-   lhld 0x5ff4
+   lhld PTR_DEAD ; Указатель в списке умирающих ячеек
    mov m,e
    inx h
    mov m,d
    inx h
-   shld 0x5ff4
+   shld PTR_DEAD ; Указатель в списке умирающих ячеек
    pop h
    pop d
    jmp @END_LOOP
 @WAS_DEAD:
    cpi 3
    jnz @END_LOOP
-   ; Клетка должна родиться
+; Клетка должна родиться
    push d
    push h
    lxi d,-79 ; Смещение от правого нижнего угла до центральной клетки
    dad d
    xchg
-   lhld 0x5ff2
+   lhld PTR_LIVE ; Указатель в списке зарождающихся ячеек
    mov m,e
    inx h
    mov m,d
    inx h
-   shld 0x5ff2
+   shld PTR_LIVE ; Указатель в списке зарождающихся ячеек
    pop h
    pop d
 @END_LOOP:
+
    mov a,e
-   lxi d,75
+   lxi d,76 ; Смещение от правой клетки до левой клетки следующей строки
    dad d
    mov e,a
 
@@ -266,7 +243,7 @@ NFA "HEIGHT"
 ; Символ '*' (живая клетка)
 NFA "LIVE"
    call __40
-   .word 0x2a  ; 2a = '*'
+   .word LIVE_CHAR  ; 2a = '*'
 
 ; Символ ' ' (мертвая клетка)
 NFA "DEAD"
@@ -281,16 +258,16 @@ NFA "SLIVE"
 ; Список умирающих ячеек
 NFA "SDEAD"
    call __40
-   .word 0x5800
+   .word 0x4000
 
 ; Указатель в списке зарождающихся ячеек
 NFA "PLIVE"
    call __40
-   .word 0x5ff2
+   .word PTR_LIVE
 
 ; Указатель в списке умирающих ячеек
 NFA "PDEAD"
    call __40
-   .word 0x5ff4
+   .word PTR_DEAD
 
 .ENDS
