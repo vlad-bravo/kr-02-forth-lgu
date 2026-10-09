@@ -260,8 +260,8 @@ NFA "LIFE2"
 @B3:
    .word _DROP          ; DROP
 ;\ Отображение подготовленных данных о рождённых и умерших ячейках
-;\ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
-;\ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+;\ PLIVE @ SLIVE DO C" + I @ C! 2 +LOOP
+;\ PDEAD @ SDEAD DO C" - I @ C! 2 +LOOP
 ;\ 500 0 DO 355 113 / DROP LOOP
    .word _PLIVE         ; PLIVE
    .word __40           ; @
@@ -287,7 +287,13 @@ NFA "LIFE2"
    .word _2             ; 2
    .word __28_2BLOOP_29,@B6 ; (+LOOP) @B6
 @B7:
-;\ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
+;\ \ Отладочная печать указателей
+;\ \ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
+;\ Очищаем мусор в верхней строке
+   .word _VIDMEM        ; VIDMEM
+   .word _WIDTH         ; WIDTH
+   .word _DEAD          ; DEAD
+   .word _FILL          ; FILL
    .word _BRANCH,@B1    ; BRANCH @B1
    .word _EXIT          ; EXIT
 

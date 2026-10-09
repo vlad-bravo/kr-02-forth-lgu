@@ -109,12 +109,18 @@
     DROP
 
     \ Отображение подготовленных данных о рождённых и умерших ячейках
-    \ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
-    \ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
+    \ PLIVE @ SLIVE DO C" + I @ C! 2 +LOOP
+    \ PDEAD @ SDEAD DO C" - I @ C! 2 +LOOP
     \ 500 0 DO 355 113 / DROP LOOP
+
     PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
     PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
-    \ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
+
+    \ \ Отладочная печать указателей
+    \ \ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .
+
+    \ Очищаем мусор в верхней строке
+    VIDMEM WIDTH DEAD FILL
   AGAIN
 ;
 
