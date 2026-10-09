@@ -14,6 +14,7 @@
 .def PTR_DEAD 0x5ff4 ; Указатель в списке умирающих ячеек
 .def LIVE_CHAR 0x2A  ; '*'
 
+; (A -- N)
 NFA "COUNTNEIGHBORS"
    pop h
    push b
@@ -72,6 +73,111 @@ NFA "COUNTNEIGHBORS"
 @skip8:
    pop b
    push d
+   jmp _FNEXT
+
+; (A -- )
+NFA2 "COUNT-NEIGHBORS", "COUNT_2DNEIGHBORS"
+   pop h
+   push b
+   lxi b,0xFFB2 ; -WIDTH
+   lxi d,0
+   dad b        ; Верхняя средняя
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip1
+   inr e
+@skip1:
+   dcx h        ; Верхняя левая
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip2
+   inr e
+@skip2:
+   inx h
+   inx h        ; Верхняя правая
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip3
+   inr e
+@skip3:
+   lxi b,0x4E   ; WIDTH, 0x4e = 78 cols
+   dad b        ; Правая
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip4
+   inr e
+@skip4:
+   dcx h        ; Центральная
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip_live
+   inr d        ; D - старший байт в DE, отметка о живой клетке
+@skip_live:
+   dcx h        ; Левая
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip5
+   inr e
+@skip5:
+   dad b        ; Левая нижняя
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip6
+   inr e
+@skip6:
+   inx h        ; Нижняя
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip7
+   inr e
+@skip7:
+   inx h        ; Нижняя правая
+   mov a,m
+   cpi LIVE_CHAR     ; '*'
+   jnz @skip8
+   inr e
+@skip8:
+
+; Проверка статуса в предыдущей тройке
+   mov a,d
+   ani 0b00000001
+   mov a,e
+   jz @WAS_DEAD
+@WAS_LIVE:
+   cpi 2
+   jz @END_LOOP
+   cpi 3
+   jz @END_LOOP
+; Клетка должна умереть
+   push h
+   lxi d,-79 ; Смещение от правого нижнего угла до центральной клетки
+   dad d
+   xchg
+   lhld PTR_DEAD ; Указатель в списке умирающих ячеек
+   mov m,e
+   inx h
+   mov m,d
+   inx h
+   shld PTR_DEAD ; Указатель в списке умирающих ячеек
+   pop h
+   jmp @END_LOOP
+@WAS_DEAD:
+   cpi 3
+   jnz @END_LOOP
+; Клетка должна родиться
+   push h
+   lxi d,-79 ; Смещение от правого нижнего угла до центральной клетки
+   dad d
+   xchg
+   lhld PTR_LIVE ; Указатель в списке зарождающихся ячеек
+   mov m,e
+   inx h
+   mov m,d
+   inx h
+   shld PTR_LIVE ; Указатель в списке зарождающихся ячеек
+   pop h
+@END_LOOP:
+   pop b
    jmp _FNEXT
 
 NFA2 "INIT-STAGE", "INIT_2DSTAGE"
