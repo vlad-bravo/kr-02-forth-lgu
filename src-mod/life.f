@@ -1,17 +1,34 @@
 \ Определение слов для последующей компиляции
 
-: FLD ( -- )
 \ Перебор всех ячеек экрана
-\    HEIGHT 0 DO
-\        WIDTH 0 DO
-\            C" . J WIDTH * I + VIDMEM + C!
-\        LOOP
-\    LOOP
+: FLD-DOTS-SLOW
+  HEIGHT 0 DO
+    WIDTH 0 DO
+      C" . J WIDTH * I + VIDMEM + C!
+    LOOP
+  LOOP
+;
+
+\ Перебор всех ячеек экрана
+: FLD-DOTS
+  VIDMEM
+  HEIGHT 0 DO
+    WIDTH 0 DO
+      C" . OVER C! 1+
+    LOOP
+  LOOP
+  DROP
+;
+\ Перебор всех ячеек экрана
+: FLD-DOTS-FAST
+  VIDMEM SIZE C" . FILL
+;
 
 \ Перебор ячеек экрана по типам
 \ A, B, C, D - по углам экрана
 \ T, L, R, B - верхняя, левая, правая, нижняя границы
 \ . - все внутренние ячейки
+: FLD ( -- )
   VIDMEM
   C" A OVER C! 1+
   C" T SWAP
@@ -60,7 +77,6 @@
   VIDMEM SIZE DEAD FILL
   \ Начальная сцена
   INIT-STAGE
-  \ 0 1 DO 355 113 / DROP LOOP
   \ Первая ячейка поля - во второй строке, второй колонке
   VIDMEM WIDTH + 1+
   BEGIN
@@ -78,10 +94,6 @@
     LOOP
     DROP
 
-    \ Отображение подготовленных данных о рождённых и умерших ячейках
-    \ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
-    \ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
-    \ 500 0 DO 355 113 / DROP LOOP
     PLIVE @ SLIVE DO LIVE I @ C! 2 +LOOP
     PDEAD @ SDEAD DO DEAD I @ C! 2 +LOOP
     \ 1B EMIT C" Y EMIT 0 EMIT 0 EMIT PLIVE @ . PDEAD @ .

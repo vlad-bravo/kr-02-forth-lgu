@@ -12,19 +12,71 @@
 .DEF PREFIX PREFIX_LIFE_F
 
 ;\ Определение слов для последующей компиляции
-NFA "FLD"
-   call _FCALL
-; ( -- )
 ;\ Перебор всех ячеек экрана
-;\    HEIGHT 0 DO
-;\        WIDTH 0 DO
-;\            C" . J WIDTH * I + VIDMEM + C!
-;\        LOOP
-;\    LOOP
+NFA2 "FLD-DOTS-SLOW", "FLD_2DDOTS_2DSLOW"
+   call _FCALL
+   .word _HEIGHT        ; HEIGHT
+   .word _0             ; 0
+   .word __28_3FDO_29,@B2 ; (?DO) @B2
+@B1:
+   .word _WIDTH         ; WIDTH
+   .word _0             ; 0
+   .word __28_3FDO_29,@B4 ; (?DO) @B4
+@B3:
+   .word _LIT, 0x2e     ; C" .
+   .word _J             ; J
+   .word _WIDTH         ; WIDTH
+   .word __2A           ; *
+   .word _I             ; I
+   .word __2B           ; +
+   .word _VIDMEM        ; VIDMEM
+   .word __2B           ; +
+   .word _C_21          ; C!
+   .word __28LOOP_29,@B3 ; (LOOP) @B3
+@B4:
+   .word __28LOOP_29,@B1 ; (LOOP) @B1
+@B2:
+   .word _EXIT          ; EXIT
+
+;\ Перебор всех ячеек экрана
+NFA2 "FLD-DOTS", "FLD_2DDOTS"
+   call _FCALL
+   .word _VIDMEM        ; VIDMEM
+   .word _HEIGHT        ; HEIGHT
+   .word _0             ; 0
+   .word __28_3FDO_29,@B2 ; (?DO) @B2
+@B1:
+   .word _WIDTH         ; WIDTH
+   .word _0             ; 0
+   .word __28_3FDO_29,@B4 ; (?DO) @B4
+@B3:
+   .word _LIT, 0x2e     ; C" .
+   .word _OVER          ; OVER
+   .word _C_21          ; C!
+   .word _1_2B          ; 1+
+   .word __28LOOP_29,@B3 ; (LOOP) @B3
+@B4:
+   .word __28LOOP_29,@B1 ; (LOOP) @B1
+@B2:
+   .word _DROP          ; DROP
+   .word _EXIT          ; EXIT
+
+;\ Перебор всех ячеек экрана
+NFA2 "FLD-DOTS-FAST", "FLD_2DDOTS_2DFAST"
+   call _FCALL
+   .word _VIDMEM        ; VIDMEM
+   .word _SIZE          ; SIZE
+   .word _LIT, 0x2e     ; C" .
+   .word _FILL          ; FILL
+   .word _EXIT          ; EXIT
+
 ;\ Перебор ячеек экрана по типам
 ;\ A, B, C, D - по углам экрана
 ;\ T, L, R, B - верхняя, левая, правая, нижняя границы
 ;\ . - все внутренние ячейки
+NFA "FLD"
+   call _FCALL
+; ( -- )
    .word _VIDMEM        ; VIDMEM
    .word _LIT, 0x41     ; C" A
    .word _OVER          ; OVER
@@ -158,7 +210,6 @@ NFA "LIFE"
    .word _FILL          ; FILL
 ;\ Начальная сцена
    .word _INIT_2DSTAGE  ; INIT-STAGE
-;\ 0 1 DO 355 113 / DROP LOOP
 ;\ Первая ячейка поля - во второй строке, второй колонке
    .word _VIDMEM        ; VIDMEM
    .word _WIDTH         ; WIDTH
@@ -192,10 +243,6 @@ NFA "LIFE"
    .word __28LOOP_29,@B2 ; (LOOP) @B2
 @B3:
    .word _DROP          ; DROP
-;\ Отображение подготовленных данных о рождённых и умерших ячейках
-;\ PLIVE @ SLIVE DO 2B I @ C! 2 +LOOP
-;\ PDEAD @ SDEAD DO 2D I @ C! 2 +LOOP
-;\ 500 0 DO 355 113 / DROP LOOP
    .word _PLIVE         ; PLIVE
    .word __40           ; @
    .word _SLIVE         ; SLIVE
